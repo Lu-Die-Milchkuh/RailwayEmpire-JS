@@ -25,6 +25,7 @@ publicRoutes.post("/register", (ctx) => {
 })
 
 publicRoutes.post("/login", (ctx) => {
+    console.log(ctx.db)
     return "/login"
 })
 
@@ -32,4 +33,6 @@ export default publicRoutes
 
 // export function (app) {
 //     app.route("/register").post()
+
+//     app.route("/login").post()
 // }
