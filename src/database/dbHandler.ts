@@ -20,11 +20,13 @@ class dbHandler {
         this.connection = connection
     }
 
-    register(username: string, password: string) {
-        const query = "INSERT INTO User(username,password) VALUES(?,?);"
+    async register(username: string, password: string) {
+        const query = "CALL sp_registerUser(?,?);"
     }
 
-    login(username: string, password: string) {}
+    async login(username: string, password: string) {
+        const query = "CALL sp_loginUser(?,?);"
+    }
 }
 
 export default dbHandler
