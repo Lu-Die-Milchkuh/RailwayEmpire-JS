@@ -9,7 +9,7 @@ const DB_CRED = {
 }
 
 class dbHandler {
-    connection: mysql2.Connection
+    private connection: mysql2.Connection
 
     // Hack: async constructor
     static async createConnection() {
