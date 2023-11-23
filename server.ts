@@ -3,7 +3,7 @@ import { Elysia } from "elysia"
 import publicRoutes from "./src/routes/publicRoutes.ts"
 import dbHandler from "./src/database/dbHandler.ts"
 
-const PORT = 8080
+const PORT = Bun.env.HTTP_PORT || 8080
 const db = await dbHandler.createConnection()
 const app = new Elysia()
 
