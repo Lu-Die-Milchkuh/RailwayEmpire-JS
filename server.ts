@@ -5,6 +5,7 @@ import dbHandler from "./src/database/dbHandler"
 // Route Plugins
 import publicRoutesPlugin from "./src/routes/publicRoutes"
 import assetRoutesPlugin from "./src/routes/assetsRoutes"
+import goodsRoutesPlugin from "./src/routes/goodsRoutes"
 
 const PORT = Bun.env.HTTP_PORT || 8080
 // const db = await dbHandler.createConnection()
@@ -19,6 +20,7 @@ app.use(swagger())
 // Populate the routes
 app.use(publicRoutesPlugin)
 app.use(assetRoutesPlugin)
+app.use(goodsRoutesPlugin)
 
 app.listen(PORT, () => {
     console.log(`Server is up and listening on Port: ${PORT}`)
