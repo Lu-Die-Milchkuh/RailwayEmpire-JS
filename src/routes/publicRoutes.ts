@@ -1,10 +1,10 @@
 import PublicController from "../controller/publicController.ts"
+import Elysia from "elysia"
 
-export function (app: Elysia) {
+export default function (app: Elysia) {
+    const publicController = new PublicController()
 
-    const publicController = new PublicController()
-    
-    app.route("/register").post(publicController.register)
+    app.post("/register", publicController.register)
 
-    app.route("/login").post(publicController.login)
+    app.post("/login", publicController.login)
 }

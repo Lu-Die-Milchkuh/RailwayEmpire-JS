@@ -8,7 +8,8 @@
   "dependencies": {
     "@elysiajs/swagger": "^0.7.4",
     "elysia": "latest",
-    "mysql2": "^3.6.3"
+    "mysql2": "^3.6.3",
+    "typescript": "^5.3.2"
   },
   "devDependencies": {
     "bun-types": "latest"

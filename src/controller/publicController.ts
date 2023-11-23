@@ -1,21 +1,14 @@
 class PublicController {
+    async register(ctx) {
+        const db = ctx.db
+        const query = "CALL sp_RegisterUser(?,?);"
+    }
 
-	async register(ctx) {
-		const db = ctx.db
-		const query = "CALL sp_RegisterUser(?,?);"
-					
-	}
+    async login(ctx) {}
 
-	async login(ctx) {
-		
-	}
+    async getWorlds(ctx) {}
 
-	async getWorlds() {}
-
-	async getWorld(id) {}
-
-	
-	
+    async getWorld(ctx) {}
 }
 
 export default PublicController
