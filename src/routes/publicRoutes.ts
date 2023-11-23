@@ -1,18 +1,22 @@
-import PublicController from "../controller/publicController"
 import { Elysia, t } from "elysia"
+import PublicController from "../controller/publicController"
 
 const publicController = new PublicController()
 
 const publicRoutesPlugin = new Elysia()
+    // Schema of the required body
+    .model({
+        User: t.Object({
+            username: t.String(),
+            password: t.String()
+        })
+    })
     .guard(
         {
-            body: t.Object({
-                username: t.String(),
-                password: t.String()
-            }),
+            body: "User",
             error({}) {
                 return {
-                    error: "Expected a Username and Password"
+                    error: "Invalid User Object! Must contain Username and Password only!"
                 }
             }
         },
