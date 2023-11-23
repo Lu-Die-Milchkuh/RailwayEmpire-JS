@@ -11,7 +11,16 @@ class PublicController {
     async getWorlds(ctx) {}
 
     // Return Information about a World specified by a provided ID
-    async getWorld(ctx) {}
+    async getWorld(ctx) {
+        const id = parseInt(ctx.params.id)
+
+        if (isNaN(id)) {
+            ctx.set.status = 400
+            return {
+                error: "ID has to be a Number!"
+            }
+        }
+    }
 }
 
 export default PublicController
