@@ -22,10 +22,12 @@ class dbHandler {
 
     async register(username: string, password: string) {
         const query = "CALL sp_registerUser(?,?);"
+        return await this.connection.execute(query, [username, password])
     }
 
     async login(username: string, password: string) {
         const query = "CALL sp_loginUser(?,?);"
+        return await this.connection.execute(query, [username, password])
     }
 }
 
