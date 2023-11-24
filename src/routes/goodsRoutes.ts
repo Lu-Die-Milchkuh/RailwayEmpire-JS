@@ -1,5 +1,6 @@
 import { Elysia, t } from "elysia"
 import GoodsController from "../controller/goodsController"
+import validateToken from "../auth/tokenAuth"
 
 const goodsController = new GoodsController()
 
@@ -23,8 +24,12 @@ const goodsRoutesPlugin = new Elysia({ prefix: "/goods" })
         },
         (app) =>
             app
-                .get("/buy", goodsController.buyGood)
-                .post("/sell", goodsController.sellGood)
+                .get("/buy", goodsController.buyGood, {
+                    beforeHandle: validateToken
+                })
+                .post("/sell", goodsController.sellGood, {
+                    beforeHandle: validateToken
+                })
     )
 
 export default goodsRoutesPlugin
