@@ -1,5 +1,6 @@
 import { Elysia } from "elysia"
 import swagger from "@elysiajs/swagger"
+import { jwt } from "@elysiajs/jwt"
 import dbHandler from "./src/database/dbHandler"
 
 // Route Plugins
@@ -14,8 +15,14 @@ const app = new Elysia()
 // Decorations can be used to bind
 // an Object to the "context" Object of the Elysia instance
 // app.decorate("db", db)
-
 app.use(swagger())
+app.use(
+    jwt({
+        name: "jwt",
+        secret: Bun.env.JWT_SECRET || "I use Arch btw",
+        exp: "1d" // Expires in 24H
+    })
+)
 
 // Populate the routes
 app.use(publicRoutesPlugin)
