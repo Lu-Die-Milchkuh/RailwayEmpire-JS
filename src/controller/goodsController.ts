@@ -1,3 +1,22 @@
+enum Good {
+    GRAIN,
+    BEVERAGE,
+    WOOD,
+    MEAT,
+    MILK,
+    BREAD,
+    FRUIT,
+    PLANKS,
+    LEATHER,
+    WOOL,
+    CHEESE,
+    FURNITURE,
+    CLOTHING,
+    METALS,
+    JEWELLERY,
+    TOOLS
+}
+
 class GoodsController {
     async sellGood(ctx) {}
 

@@ -64,11 +64,28 @@ class PublicController {
     // Return Information about a World specified by a provided ID
     async getWorld(ctx) {
         const id = parseInt(ctx.params.id)
+        const db = ctx.db
 
         if (isNaN(id)) {
             ctx.set.status = 400
             return {
                 error: "ID has to be a Number!"
+            }
+        }
+
+        try {
+            const world = await db.getWorld(id)
+            if (!world) {
+                ctx.set.status = 404
+                return {
+                    error: "A World with that ID does not exist!"
+                }
+            }
+            return world
+        } catch (error) {
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later."
             }
         }
     }

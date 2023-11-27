@@ -22,9 +22,9 @@ const goodsRoutesPlugin = new Elysia({ prefix: "/goods" })
                 }
             }
         },
-        (app) =>
-            app
-                .get("/buy", goodsController.buyGood, {
+        (plugin) =>
+            plugin
+                .post("/buy", goodsController.buyGood, {
                     beforeHandle: validateToken
                 })
                 .post("/sell", goodsController.sellGood, {

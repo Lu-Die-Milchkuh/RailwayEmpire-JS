@@ -9,6 +9,11 @@ const publicRoutesPlugin = new Elysia()
         User: t.Object({
             username: t.String(),
             password: t.String()
+        }),
+        World: t.Object({
+            id: t.Number(),
+            creationDate: t.String(),
+            playerCount: t.Number()
         })
     })
     .guard(
@@ -20,15 +25,32 @@ const publicRoutesPlugin = new Elysia()
                 }
             }
         },
-        (app) =>
-            app
-                .post("/register", publicController.register)
-                .post("/login", publicController.login)
+        (plugin) =>
+            plugin
+                .post("/register", publicController.register, {
+                    response: {
+                        200: t.Object({ token: t.String() }),
+                        400: t.Object({ error: t.String() })
+                    }
+                })
+                .post("/login", publicController.login, {
+                    response: {
+                        200: t.Object({ token: t.String() }),
+                        404: t.Object({ error: t.String() })
+                    }
+                })
     )
-    .group("/world", (app) =>
-        app
+    .group("/world", (plugin) =>
+        plugin
             .get("/", publicController.getWorlds)
-            .get("/:id", publicController.getWorld)
+            .get("/:id", publicController.getWorld, {
+                response: {
+                    200: "World",
+                    404: t.Object({
+                        error: t.String()
+                    })
+                }
+            })
     )
 
 export default publicRoutesPlugin
