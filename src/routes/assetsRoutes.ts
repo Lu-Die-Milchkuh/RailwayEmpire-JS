@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia"
 import AssetController from "../controller/assetsController"
-import validateToken from "../auth/tokenAuth"
+import { validateToken } from "../auth/tokenAuth"
 
 const assetController = new AssetController()
 
@@ -8,8 +8,10 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     .model({
         Town: t.Object({
             name: t.String(),
-            posX: t.Number(),
-            posY: t.Number()
+            position: t.Object({
+                x: t.Number(),
+                y: t.Number()
+            })
         }),
         Industry: t.Object({
             type: t.String()

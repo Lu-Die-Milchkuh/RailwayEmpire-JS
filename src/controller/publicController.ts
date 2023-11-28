@@ -1,25 +1,26 @@
+import { generateToken } from "../auth/tokenAuth"
+
 class PublicController {
     async register(ctx) {
         const db = ctx.db
         const username = ctx.body.username
         const password = ctx.body.password
-        const jwt = ctx.jwt
 
         try {
-            const result = await db.register(username, password)
+            await db.register(username, password)
 
-            if (!result) {
+            const token = await generateToken(ctx)
+            return {
+                token: token
+            }
+        } catch (error) {
+            if (error.code === "ER_DUP_ENTRY") {
                 ctx.set.status = 400
                 return {
                     error: "Username already taken!"
                 }
             }
 
-            const token = await jwt.sign(ctx.body)
-            return {
-                token: token
-            }
-        } catch (error) {
             console.log(error)
             ctx.set.status = 500
             return {

@@ -9,12 +9,12 @@ import assetRoutesPlugin from "./src/routes/assetsRoutes"
 import goodsRoutesPlugin from "./src/routes/goodsRoutes"
 
 const PORT = Bun.env.HTTP_PORT || 8080
-// const db = await dbHandler.createConnection()
+const db = await dbHandler.createConnection()
 const app = new Elysia()
 
 // Decorations can be used to bind
 // an Object to the "context" Object of the Elysia instance
-// app.decorate("db", db)
+app.decorate("db", db)
 app.use(swagger())
 app.use(
     jwt({

@@ -1,0 +1,14 @@
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `sp_loginUser`;
+
+CREATE PROCEDURE `sp_loginUser`(IN user JSON)
+BEGIN
+    IF NOT(JSON_VALID(user)) THEN 
+        SIGNAL SQLSTATE '45000'
+	    SET MESSAGE_TEXT = 'Invalid JSON';
+	END IF;
+
+END$$
+
+DELIMITER ;

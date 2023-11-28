@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia"
 import GoodsController from "../controller/goodsController"
-import validateToken from "../auth/tokenAuth"
+import { validateToken } from "../auth/tokenAuth"
 
 const goodsController = new GoodsController()
 
