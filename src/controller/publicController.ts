@@ -7,7 +7,11 @@ class PublicController {
         const password = ctx.body.password
 
         try {
-            await db.register(username, password)
+            const HASHED_PASSWORD = await Bun.password.hash(password, {
+                algorithm: "bcrypt"
+            })
+
+            await db.register(username, HASHED_PASSWORD)
 
             const token = await generateToken(ctx)
             return {
@@ -36,7 +40,11 @@ class PublicController {
         const jwt = ctx.jwt
 
         try {
-            const result = await db.login(username, password)
+            const HASHED_PASSWORD = await Bun.password.hash(password, {
+                algorithm: "bcrypt"
+            })
+
+            const result = await db.login(username, HASHED_PASSWORD)
 
             if (!result) {
                 ctx.set.status = 404
@@ -45,7 +53,7 @@ class PublicController {
                 }
             }
 
-            const token = await jwt.sign(ctx.body)
+            const token = await jwt.sign(username)
 
             return {
                 token: token

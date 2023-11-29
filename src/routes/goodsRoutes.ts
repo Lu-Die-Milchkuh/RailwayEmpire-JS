@@ -12,7 +12,7 @@ const goodsRoutesPlugin = new Elysia({ prefix: "/goods" })
             amount: t.Number()
         })
     })
-    .get("/", goodsController.getAllGoods)
+    .get("/", goodsController.getAllGoods, { beforeHandle: validateToken })
     .guard(
         {
             body: "Good",

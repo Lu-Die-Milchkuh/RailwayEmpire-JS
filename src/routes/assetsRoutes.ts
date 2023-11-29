@@ -20,43 +20,51 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     .get("/", assetController.getAllAssets, { beforeHandle: validateToken })
     .group("/town", (plugin) =>
         plugin
-            .get("/", () => {})
+            .get("/", () => {}, { beforeHandle: validateToken })
             .group("/industry", (plugin) =>
                 plugin
-                    .get("/", () => {})
-                    .get("/:id", () => {})
-                    .post("/", () => {})
+                    .get("/", () => {}, { beforeHandle: validateToken })
+                    .get("/:id", () => {}, { beforeHandle: validateToken })
+                    .post("/", () => {}, { beforeHandle: validateToken })
             )
             .group("/station", (plugin) =>
                 plugin
-                    .get("/", () => {})
-                    .get("/:id", () => {})
-                    .get("/track", () => {})
-                    .post("/track", () => {})
-                    .post("/", () => {})
+                    .get("/", () => {}, { beforeHandle: validateToken })
+                    .get("/:id", () => {}, { beforeHandle: validateToken })
+                    .get("/track", () => {}, { beforeHandle: validateToken })
+                    .post("/track", () => {}, { beforeHandle: validateToken })
+                    .post("/", () => {}, { beforeHandle: validateToken })
                     .group("/train", (plugin) =>
                         plugin
-                            .get("/", () => {})
-                            .get("/:id", () => {})
-                            .post("/", () => {})
+                            .get("/", () => {}, { beforeHandle: validateToken })
+                            .get("/:id", () => {}, {
+                                beforeHandle: validateToken
+                            })
+                            .post("/", () => {}, {
+                                beforeHandle: validateToken
+                            })
                     )
             )
     )
     .group("/business", (plugin) =>
         plugin
-            .get("/", () => {})
-            .get("/:id", () => {})
-            .post("/", () => {})
+            .get("/", () => {}, { beforeHandle: validateToken })
+            .get("/:id", () => {}, { beforeHandle: validateToken })
+            .post("/", () => {}, { beforeHandle: validateToken })
             .group("/station", (plugin) =>
                 plugin
-                    .get("/", () => {})
-                    .get("/:id", () => {})
-                    .post("/", () => {})
+                    .get("/", () => {}, { beforeHandle: validateToken })
+                    .get("/:id", () => {}, { beforeHandle: validateToken })
+                    .post("/", () => {}, { beforeHandle: validateToken })
                     .group("/train", (plugin) =>
                         plugin
-                            .get("/", () => {})
-                            .get("/:id", () => {})
-                            .post("/", () => {})
+                            .get("/", () => {}, { beforeHandle: validateToken })
+                            .get("/:id", () => {}, {
+                                beforeHandle: validateToken
+                            })
+                            .post("/", () => {}, {
+                                beforeHandle: validateToken
+                            })
                     )
             )
     )
