@@ -1,5 +1,13 @@
 import mysql2 from "mysql2/promise"
 
+type Town = {
+    name: string,
+    position: {
+        x: number,
+        y: number
+    }
+}
+
 const DB_CRED = {
     host: Bun.env.DB_HOST || "localhost",
     port: Bun.env.DB_PORT || 3306,
@@ -29,11 +37,10 @@ class dbHandler {
         return await this.connection.execute(query, [jsonData])
     }
 
-    async login(username: string, password: string) {
+    async login(username: string) {
         const query = "CALL sp_loginUser(?);"
         const jsonData = JSON.stringify({
             username: username,
-            password: password
         })
         return await this.connection.execute(query, [jsonData])
     }
@@ -46,6 +53,21 @@ class dbHandler {
         })
 
         return await this.connection.execute(query, [jsonData])
+    }
+
+    async buyTown(token: string, town: Town) {
+        const query = "Call sp_buyTown(?);"
+        const jsonData = JSON.stringify({
+            token: token,
+            town: town
+        })
+
+        return await this.connection.execute(query, [jsonData])
+    }
+
+    async getWorldById(id: number) {
+        const query = "CALL sp_getWorldById(?);"
+        return await this.connection.execute(query, [id])
     }
 }
 

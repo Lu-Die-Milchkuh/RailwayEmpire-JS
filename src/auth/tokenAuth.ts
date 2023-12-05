@@ -23,6 +23,9 @@ async function validateToken(ctx) {
                 error: "Unauthorized! The provided Token is not valid!"
             }
         }
+
+        console.log(profile)
+
     } catch (err) {
         console.log(err)
         ctx.set.status = 500

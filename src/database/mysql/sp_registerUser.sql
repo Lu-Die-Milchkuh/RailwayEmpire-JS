@@ -12,31 +12,31 @@ BEGIN
     DECLARE v_worldID INT;
 
    
-	#DECLARE userSchema JSON DEFAULT '{
-	#					        "username": "",
-	#					        "password": "",
-	#					    }';
+# 	DECLARE userSchema JSON DEFAULT '{
+# 						        "username": "",
+# 						        "password": "",
+# 						    }';
 
 	IF NOT(JSON_VALID(user)) THEN 
         SIGNAL SQLSTATE '45000'
 	    SET MESSAGE_TEXT = 'Invalid JSON';
 	END IF;
 
-    # Fedora 39 doesn't have a recent enough version of MariaDB...
-	#IF NOT(JSON_SCHEMA_VALID(userSchema, user)) THEN
-    #    SIGNAL SQLSTATE '45000'
-	#    SET MESSAGE_TEXT = 'Invalid JSON Schema';
-	#END IF;
 
-	SET v_username = JSON_EXTRACT(user, '$.username');
-	SET v_password = JSON_EXTRACT(user, '$.password');
+# 	IF NOT(JSON_SCHEMA_VALID(userSchema, user)) THEN
+#         SIGNAL SQLSTATE '45000'
+# 	    SET MESSAGE_TEXT = 'Invalid JSON Schema';
+# 	END IF;
+
+	SET v_username = JSON_UNQUOTE(JSON_EXTRACT(user, '$.username'));
+	SET v_password = JSON_UNQUOTE(JSON_EXTRACT(user, '$.password'));
 
     IF v_username IS NULL OR v_password IS NULL THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Invalid JSON Schema';
     END IF;
 
-    SELECT worldID INTO v_worldID FROM World WHERE numberOfPlayers < 20 ORDER BY creationDate LIMIT 1;
+    SELECT worldID INTO v_worldID FROM World WHERE numberOfPlayers < 5 ORDER BY creationDate LIMIT 1;
 
     -- If no world is found, create a new one
     IF v_worldID IS NULL THEN

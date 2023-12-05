@@ -15,8 +15,8 @@ BEGIN
 	    SET MESSAGE_TEXT = 'Invalid JSON';
     END IF;
 
-    SET v_username = JSON_EXTRACT(jsonData, '$.username');
-	SET v_token = JSON_EXTRACT(jsonData, '$.token');
+    SET v_username = JSON_UNQUOTE(JSON_EXTRACT(jsonData, '$.username'));
+	SET v_token = JSON_UNQUOTE(JSON_EXTRACT(jsonData, '$.token'));
 
     IF v_username IS NULL OR v_token IS NULL THEN
         SIGNAL SQLSTATE '45000'

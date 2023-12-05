@@ -40,20 +40,27 @@ class PublicController {
         const jwt = ctx.jwt
 
         try {
-            const HASHED_PASSWORD = await Bun.password.hash(password, {
-                algorithm: "bcrypt"
-            })
 
-            const result = await db.login(username, HASHED_PASSWORD)
+            const result = await db.login(username)
+            const HASHED_PASSWORD = result[0][0][0]?.password
 
-            if (!result) {
+            if (!HASHED_PASSWORD) {
                 ctx.set.status = 404
                 return {
                     error: "Username not found!"
                 }
             }
 
+            if (!(await Bun.password.verify(password, HASHED_PASSWORD))) {
+                ctx.set.status = 401
+                return {
+                    error: "Wrong Password!"
+                }
+            }
+
             const token = await jwt.sign(username)
+
+            await db.saveToken(username, token)
 
             return {
                 token: token
@@ -68,14 +75,22 @@ class PublicController {
     }
 
     // Return an array of all World containing the ID,CreationDate and the number of Players
-    async getWorlds(ctx) {}
-
-    // Return Information about a World specified by a provided ID
-    async getWorld(ctx) {
-        const id = parseInt(ctx.params.id)
+    async getWorlds(ctx) {
         const db = ctx.db
 
-        if (isNaN(id)) {
+        // try {
+
+        // }
+    }
+
+    // Return Information about a World specified by a provided ID
+    async getWorldById(ctx) {
+        const id = ctx.params.id
+        const db = ctx.db
+
+        const isNum = /^\d+$/.test(id);
+
+        if (!isNum) {
             ctx.set.status = 400
             return {
                 error: "ID has to be a Number!"
@@ -83,7 +98,9 @@ class PublicController {
         }
 
         try {
-            const world = await db.getWorld(id)
+            const result = await db.getWorldById(id)
+            const world = result[0][0][0]?.world
+
             if (!world) {
                 ctx.set.status = 404
                 return {
@@ -92,6 +109,7 @@ class PublicController {
             }
             return world
         } catch (error) {
+            console.log(error)
             ctx.set.status = 500
             return {
                 error: "Internal Server error! Please try again later."

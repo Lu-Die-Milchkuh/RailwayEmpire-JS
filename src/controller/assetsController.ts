@@ -21,17 +21,40 @@ enum INDUSTRY {
 }
 
 class AssetController {
-    async buyTown(ctx) {}
+    async buyTown(ctx) {
+        const db = ctx.db
+        const town = ctx.body.town
+        const token = ctx.headers["authorization"]
 
-    async buyIndustry(ctx) {}
+        try {
 
-    async buyStation(ctx) {}
+            await db.buyTown(token, town)
 
-    async buyTrain(ctx) {}
+            return {
+                town: town
+            }
 
-    async buyTrack(ctx) {}
+        } catch (error) {
 
-    async getAllAssets(ctx) {}
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+
+        }
+    }
+
+    async buyIndustry(ctx) { }
+
+    async buyStation(ctx) { }
+
+    async buyTrain(ctx) { }
+
+    async buyTrack(ctx) { }
+
+    async getAllTowns(ctx) { }
+
+    async getAllAssets(ctx) { }
 }
 
 export default AssetController

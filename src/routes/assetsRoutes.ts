@@ -20,27 +20,34 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     .get("/", assetController.getAllAssets, { beforeHandle: validateToken })
     .group("/town", (plugin) =>
         plugin
-            .get("/", () => {}, { beforeHandle: validateToken })
+            .get("/", assetController.getAllTowns, { beforeHandle: validateToken })
+            .post("/", assetController.buyTown, {
+                body: "Town", error({ }) {
+                    return {
+                        error: "Missing Town Object!"
+                    }
+                }, beforeHandle: validateToken
+            })
             .group("/industry", (plugin) =>
                 plugin
-                    .get("/", () => {}, { beforeHandle: validateToken })
-                    .get("/:id", () => {}, { beforeHandle: validateToken })
-                    .post("/", () => {}, { beforeHandle: validateToken })
+                    .get("/", () => { }, { beforeHandle: validateToken })
+                    .get("/:id", () => { }, { beforeHandle: validateToken })
+                    .post("/", () => { }, { beforeHandle: validateToken })
             )
             .group("/station", (plugin) =>
                 plugin
-                    .get("/", () => {}, { beforeHandle: validateToken })
-                    .get("/:id", () => {}, { beforeHandle: validateToken })
-                    .get("/track", () => {}, { beforeHandle: validateToken })
-                    .post("/track", () => {}, { beforeHandle: validateToken })
-                    .post("/", () => {}, { beforeHandle: validateToken })
+                    .get("/", () => { }, { beforeHandle: validateToken })
+                    .get("/:id", () => { }, { beforeHandle: validateToken })
+                    .get("/track", () => { }, { beforeHandle: validateToken })
+                    .post("/track", () => { }, { beforeHandle: validateToken })
+                    .post("/", () => { }, { beforeHandle: validateToken })
                     .group("/train", (plugin) =>
                         plugin
-                            .get("/", () => {}, { beforeHandle: validateToken })
-                            .get("/:id", () => {}, {
+                            .get("/", () => { }, { beforeHandle: validateToken })
+                            .get("/:id", () => { }, {
                                 beforeHandle: validateToken
                             })
-                            .post("/", () => {}, {
+                            .post("/", () => { }, {
                                 beforeHandle: validateToken
                             })
                     )
@@ -48,21 +55,21 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     )
     .group("/business", (plugin) =>
         plugin
-            .get("/", () => {}, { beforeHandle: validateToken })
-            .get("/:id", () => {}, { beforeHandle: validateToken })
-            .post("/", () => {}, { beforeHandle: validateToken })
+            .get("/", () => { }, { beforeHandle: validateToken })
+            .get("/:id", () => { }, { beforeHandle: validateToken })
+            .post("/", () => { }, { beforeHandle: validateToken })
             .group("/station", (plugin) =>
                 plugin
-                    .get("/", () => {}, { beforeHandle: validateToken })
-                    .get("/:id", () => {}, { beforeHandle: validateToken })
-                    .post("/", () => {}, { beforeHandle: validateToken })
+                    .get("/", () => { }, { beforeHandle: validateToken })
+                    .get("/:id", () => { }, { beforeHandle: validateToken })
+                    .post("/", () => { }, { beforeHandle: validateToken })
                     .group("/train", (plugin) =>
                         plugin
-                            .get("/", () => {}, { beforeHandle: validateToken })
-                            .get("/:id", () => {}, {
+                            .get("/", () => { }, { beforeHandle: validateToken })
+                            .get("/:id", () => { }, {
                                 beforeHandle: validateToken
                             })
-                            .post("/", () => {}, {
+                            .post("/", () => { }, {
                                 beforeHandle: validateToken
                             })
                     )
