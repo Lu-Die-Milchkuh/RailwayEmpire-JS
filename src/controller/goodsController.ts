@@ -1,4 +1,4 @@
-enum Good {
+export enum GoodType {
     GRAIN,
     BEVERAGE,
     WOOD,
@@ -18,11 +18,67 @@ enum Good {
 }
 
 class GoodsController {
-    async sellGood(ctx) {}
+    async sellGood(ctx) {
+        const db = ctx.db
+        const { type, amount } = ctx.body
+        const token = ctx.headers["authorization"]
 
-    async buyGood(ctx) {}
+        try {
+            if (type in GoodType) {
 
-    async getAllGoods(ctx) {}
+            }
+            await db.sellGood(token, type, amount)
+
+
+        }
+        catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server Error! Try again later"
+            }
+        }
+
+    }
+
+    async buyGood(ctx) {
+        const db = ctx.db
+        const { type, amount } = ctx.body
+        const token = ctx.headers["authorization"]
+
+        try {
+            const good = await db.buyGood(token, type, amount)
+
+            return {
+                good: good
+            }
+        }
+        catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server Error! Try again later"
+            }
+        }
+    }
+
+    async getAllGoods(ctx) {
+        const token = ctx.headers["authorization"]
+        const db = ctx.db
+
+        try {
+            const result = await db.getAllGoods(token)
+
+
+
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server Error! Try again later"
+            }
+        }
+    }
 }
 
 export default GoodsController

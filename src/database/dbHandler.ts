@@ -1,4 +1,5 @@
 import mysql2 from "mysql2/promise"
+import { GoodType } from "../controller/goodsController"
 
 type Town = {
     name: string,
@@ -50,6 +51,28 @@ class dbHandler {
         const jsonData = JSON.stringify({
             username: username,
             token: token
+        })
+
+        return await this.connection.execute(query, [jsonData])
+    }
+
+    async buyGood(token: string, type: GoodType, amount: number) {
+        const query = "CALL sp_buyGood(?);"
+        const jsonData = JSON.stringify({
+            token: token,
+            type: type,
+            amount: amount
+        })
+
+        return await this.connection.execute(query, [jsonData])
+    }
+
+    async sellGood(token: string, type: GoodType, amount: number) {
+        const query = "Call sp_sellGood(?);"
+        const jsonData = JSON.stringify({
+            token: token,
+            type: type,
+            amount: amount
         })
 
         return await this.connection.execute(query, [jsonData])
