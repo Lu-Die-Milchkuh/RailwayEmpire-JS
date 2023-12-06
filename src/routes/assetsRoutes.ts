@@ -7,14 +7,20 @@ const assetController = new AssetController()
 const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     .model({
         Town: t.Object({
+            assetID: t.Optional(t.Number()),
             name: t.String(),
             position: t.Object({
                 x: t.Number(),
                 y: t.Number()
-            })
+            }),
+            owner: t.Optional(t.String())
         }),
-        Industry: t.Object({
-            type: t.String()
+        Business: t.Object({
+            type: t.String(),
+            position: t.Object({
+                x: t.Number(),
+                y: t.Number()
+            })
         })
     })
     .get("/", assetController.getAllAssets, { beforeHandle: validateToken })
@@ -22,7 +28,12 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
         plugin
             .get("/", assetController.getAllTowns, { beforeHandle: validateToken })
             .post("/", assetController.buyTown, {
-                body: "Town", error({ }) {
+                body: "Town",
+                response: {
+                    200: "Town",
+                    401: t.Object({ error: t.String() })
+                },
+                error({ }) {
                     return {
                         error: "Missing Town Object!"
                     }

@@ -28,10 +28,18 @@ class AssetController {
 
         try {
 
-            await db.buyTown(token, town)
+            const result = await db.buyTown(token, town)
+            const newTown = result[0][0][0]?.town
+
+            if (!newTown) {
+                ctx.set.status = 404
+                return {
+                    error: "No Town found on that position"
+                }
+            }
 
             return {
-                town: town
+                town: newTown
             }
 
         } catch (error) {

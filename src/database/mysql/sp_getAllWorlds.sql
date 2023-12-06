@@ -6,7 +6,7 @@ DROP PROCEDURE IF EXISTS `sp_getAllWorlds`;
 
 CREATE PROCEDURE `sp_getAllWorlds`()
 BEGIN
-   
+
 END$$
 
 DELIMITER ;
