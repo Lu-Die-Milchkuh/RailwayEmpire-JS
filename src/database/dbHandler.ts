@@ -2,9 +2,9 @@ import mysql2 from "mysql2/promise"
 import { GoodType } from "../controller/goodsController"
 
 type Town = {
-    name: string,
+    name: string
     position: {
-        x: number,
+        x: number
         y: number
     }
 }
@@ -41,7 +41,7 @@ class dbHandler {
     async login(username: string) {
         const query = "CALL sp_loginUser(?);"
         const jsonData = JSON.stringify({
-            username: username,
+            username: username
         })
         return await this.connection.execute(query, [jsonData])
     }
@@ -78,13 +78,13 @@ class dbHandler {
         return await this.connection.execute(query, [jsonData])
     }
 
-    async buyTown(token: string, town: Town) {
+    async buyTown(token: string, townID: number, name: string = "") {
         const query = "Call sp_buyTown(?);"
         const jsonData = JSON.stringify({
             token: token,
-            town: town
+            townID: townID,
+            name: name
         })
-
         return await this.connection.execute(query, [jsonData])
     }
 

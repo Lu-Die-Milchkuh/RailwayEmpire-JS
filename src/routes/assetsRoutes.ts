@@ -7,13 +7,13 @@ const assetController = new AssetController()
 const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     .model({
         Town: t.Object({
-            assetID: t.Optional(t.Number()),
+            assetID: t.Number(),
             name: t.String(),
             position: t.Object({
                 x: t.Number(),
                 y: t.Number()
             }),
-            owner: t.Optional(t.String())
+            owner: t.String()
         }),
         Business: t.Object({
             type: t.String(),
@@ -25,65 +25,77 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     })
     .get("/", assetController.getAllAssets, { beforeHandle: validateToken })
     .group("/town", (plugin) =>
-        plugin
-            .get("/", assetController.getAllTowns, { beforeHandle: validateToken })
-            .post("/", assetController.buyTown, {
-                body: "Town",
-                response: {
-                    200: "Town",
-                    401: t.Object({ error: t.String() })
-                },
-                error({ }) {
+        plugin.get("/", assetController.getAllTowns).guard(
+            {
+                body: t.Object({
+                    townID: t.Number(),
+                    name: t.Optional(t.String())
+                }),
+                error({}) {
                     return {
-                        error: "Missing Town Object!"
+                        error: "You need to provide a valid TownID and optional a name!"
                     }
-                }, beforeHandle: validateToken
-            })
-            .group("/industry", (plugin) =>
+                },
+                beforeHandle: validateToken
+            },
+            (plugin) =>
                 plugin
-                    .get("/", () => { }, { beforeHandle: validateToken })
-                    .get("/:id", () => { }, { beforeHandle: validateToken })
-                    .post("/", () => { }, { beforeHandle: validateToken })
-            )
-            .group("/station", (plugin) =>
-                plugin
-                    .get("/", () => { }, { beforeHandle: validateToken })
-                    .get("/:id", () => { }, { beforeHandle: validateToken })
-                    .get("/track", () => { }, { beforeHandle: validateToken })
-                    .post("/track", () => { }, { beforeHandle: validateToken })
-                    .post("/", () => { }, { beforeHandle: validateToken })
-                    .group("/train", (plugin) =>
+                    .post("/", assetController.buyTown, {
+                        response: {
+                            200: "Town",
+                            404: t.Object({ error: t.String() })
+                        }
+                    })
+                    .group("/industry", (plugin) =>
                         plugin
-                            .get("/", () => { }, { beforeHandle: validateToken })
-                            .get("/:id", () => { }, {
-                                beforeHandle: validateToken
-                            })
-                            .post("/", () => { }, {
-                                beforeHandle: validateToken
-                            })
+                            .get("/", assetController.getAllIndustries)
+                            .get("/:id", assetController.getIndustryByID)
+                            .post("/", assetController.buyIndustry)
                     )
-            )
+                    .group("/station", (plugin) =>
+                        plugin
+                            .get("/", assetController.getAllStations)
+                            .get("/:id", assetController.getStationByID)
+                            .get("/track", assetController.getTrack)
+                            .post("/track", assetController.buyTrack)
+                            .post("/", assetController.buyStation)
+                            .group("/train", (plugin) =>
+                                plugin
+                                    .get("/", assetController.getTrains)
+                                    .get("/:id", assetController.getTrainByID)
+                                    .post("/", assetController.buyTrain)
+                            )
+                    )
+        )
     )
-    .group("/business", (plugin) =>
+    .group("/business", { beforeHandle: validateToken }, (plugin) =>
         plugin
-            .get("/", () => { }, { beforeHandle: validateToken })
-            .get("/:id", () => { }, { beforeHandle: validateToken })
-            .post("/", () => { }, { beforeHandle: validateToken })
-            .group("/station", (plugin) =>
-                plugin
-                    .get("/", () => { }, { beforeHandle: validateToken })
-                    .get("/:id", () => { }, { beforeHandle: validateToken })
-                    .post("/", () => { }, { beforeHandle: validateToken })
-                    .group("/train", (plugin) =>
-                        plugin
-                            .get("/", () => { }, { beforeHandle: validateToken })
-                            .get("/:id", () => { }, {
-                                beforeHandle: validateToken
-                            })
-                            .post("/", () => { }, {
-                                beforeHandle: validateToken
-                            })
-                    )
+            .get("/", assetController.getAllBusiness)
+            .get("/:id", assetController.getBusinessByID)
+            .guard(
+                {
+                    body: t.Object({
+                        businessID: t.Number()
+                    })
+                },
+                (plugin) =>
+                    plugin
+                        .post("/", assetController.buyBusiness)
+                        .group("/station", (plugin) =>
+                            plugin
+                                .get("/", assetController.getAllStations)
+                                .get("/:id", assetController.getStationByID)
+                                .post("/", assetController.buyStation)
+                                .group("/train", (plugin) =>
+                                    plugin
+                                        .get("/", assetController.buyTrain)
+                                        .get(
+                                            "/:id",
+                                            assetController.getTrainByID
+                                        )
+                                        .post("/", assetController.buyTrain)
+                                )
+                        )
             )
     )
 

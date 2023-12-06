@@ -11,7 +11,7 @@ BEGIN
     DECLARE v_token VARCHAR(512);
     DECLARE v_townCost FLOAT;
     DECLARE v_funds FLOAT;
-    DECLARE v_position POINT;
+    DECLARE v_name VARCHAR(255);
 
     IF NOT (JSON_VALID(jsonData)) THEN
         SIGNAL SQLSTATE '45000'
@@ -19,18 +19,11 @@ BEGIN
     END IF;
 
     SET v_token = JSON_EXTRACT(jsonData, '$.token');
-    SET v_position = JSON_EXTRACT(jsonData, '$.position');
+    SET v_townID = JSON_EXTRACT(jsonData, '$.townID');
+    SET v_name = JSON_EXTRACT(jsonData,'$.name');
 
     SELECT userIDFK INTO v_userID FROM Token WHERE token = v_token;
     SELECT funds INTO v_funds FROM User WHERE userID = v_userID;
-
-    SELECT assetID INTO v_townID FROM Asset WHERE position = v_position;
-
-    IF (v_townID IS NULL) THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'No town at this position';
-    END IF;
-
     SELECT cost INTO v_townCost FROM Asset WHERE assetID = v_townID;
 
     IF ((v_funds - v_townCost) < 0) THEN
@@ -40,6 +33,10 @@ BEGIN
 
     UPDATE User SET funds = (v_funds - v_townCost) WHERE userID = v_userID;
     UPDATE Asset SET userIDFK = v_userID WHERE assetID = v_townID;
+
+    IF (v_name NOT NULL) THEN
+        UPDATE Asset SET name = v_name WHERE assetID = v_townID;
+    END IF;
 
     SELECT JSON_OBJECT(
                    'assetID', a.assetID,

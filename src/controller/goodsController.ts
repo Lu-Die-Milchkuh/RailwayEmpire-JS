@@ -25,20 +25,15 @@ class GoodsController {
 
         try {
             if (type in GoodType) {
-
             }
             await db.sellGood(token, type, amount)
-
-
-        }
-        catch (error) {
+        } catch (error) {
             console.log(error)
             ctx.set.status = 500
             return {
                 error: "Internal Server Error! Try again later"
             }
         }
-
     }
 
     async buyGood(ctx) {
@@ -52,8 +47,7 @@ class GoodsController {
             return {
                 good: good
             }
-        }
-        catch (error) {
+        } catch (error) {
             console.log(error)
             ctx.set.status = 500
             return {
@@ -68,9 +62,6 @@ class GoodsController {
 
         try {
             const result = await db.getAllGoods(token)
-
-
-
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
