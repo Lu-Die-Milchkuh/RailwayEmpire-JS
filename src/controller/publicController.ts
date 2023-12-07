@@ -1,3 +1,28 @@
+/*
+ *
+ *   MIT License
+ *
+ *   Copyright (c) 2023 Lucas Zebrowsky
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import { generateToken } from "../auth/tokenAuth"
 
 class PublicController {
@@ -40,7 +65,6 @@ class PublicController {
         const jwt = ctx.jwt
 
         try {
-
             const result = await db.login(username)
             const HASHED_PASSWORD = result[0][0][0]?.password
 
@@ -88,7 +112,7 @@ class PublicController {
         const id = ctx.params.id
         const db = ctx.db
 
-        const isNum = /^\d+$/.test(id);
+        const isNum = /^\d+$/.test(id)
 
         if (!isNum) {
             ctx.set.status = 400
