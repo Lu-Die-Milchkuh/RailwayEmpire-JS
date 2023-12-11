@@ -113,6 +113,11 @@ class dbHandler {
         return await this.connection.execute(query, [jsonData])
     }
 
+    async getWorlds() {
+        const query = "CALL sp_getAllWorlds();"
+        return await this.connection.execute(query)
+    }
+
     async getWorldById(id: number) {
         const query = "CALL sp_getWorldById(?);"
         return await this.connection.execute(query, [id])

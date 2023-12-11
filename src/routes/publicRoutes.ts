@@ -35,6 +35,13 @@ const Player = t.Object({
     username: t.String()
 })
 
+const World = t.Object({
+    worldID: t.Number(),
+    creationDate: t.String(),
+    numberOfPlayers: t.Number(),
+    players: t.Array(Player)
+})
+
 const publicRoutesPlugin = new Elysia()
     // Schema of the required body
     .model({
@@ -43,12 +50,7 @@ const publicRoutesPlugin = new Elysia()
             password: t.String()
         }),
         Player: Player,
-        World: t.Object({
-            worldID: t.Number(),
-            creationDate: t.String(),
-            numberOfPlayers: t.Number(),
-            players: t.Array(Player)
-        })
+        World: World
     })
     .guard(
         {
@@ -76,7 +78,12 @@ const publicRoutesPlugin = new Elysia()
     )
     .group("/world", (plugin) =>
         plugin
-            .get("/", publicController.getWorlds)
+            .get("/", publicController.getWorlds, {
+                response: {
+                    200: t.Array(World),
+                    404: t.Object({ error: t.String() })
+                }
+            })
             .get("/:id", publicController.getWorldById, {
                 response: {
                     200: "World",

@@ -2,9 +2,9 @@ USE Railway;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS "sp_buyTown";
+DROP PROCEDURE IF EXISTS sp_buyTown;
 
-CREATE PROCEDURE "sp_buyTown"(IN jsonData JSON)
+CREATE PROCEDURE sp_buyTown(IN jsonData JSON)
 BEGIN
     DECLARE v_userID INT;
     DECLARE v_townID INT;
@@ -34,7 +34,7 @@ BEGIN
     UPDATE User SET funds = (v_funds - v_townCost) WHERE userID = v_userID;
     UPDATE Asset SET userIDFK = v_userID WHERE assetID = v_townID;
 
-    IF (v_name NOT NULL) THEN
+    IF (v_name IS NOT NULL) THEN
         UPDATE Asset SET name = v_name WHERE assetID = v_townID;
     END IF;
 

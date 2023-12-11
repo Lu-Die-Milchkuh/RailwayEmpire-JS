@@ -43,7 +43,7 @@ class PublicController {
                 token: token
             }
         } catch (error) {
-            if (error.code === "ER_DUP_ENTRY") {
+            if (error.message === "Duplicate entry for username") {
                 ctx.set.status = 400
                 return {
                     error: "Username already taken!"
@@ -102,9 +102,26 @@ class PublicController {
     async getWorlds(ctx) {
         const db = ctx.db
 
-        // try {
+        try {
+            const result = await db.getWorlds()
+            const worlds = result[0][0][0]?.worlds
 
-        // }
+            if (!worlds) {
+                ctx.set.status = 404
+                return {
+                    error: "You found a Glitch in the Matrix! There are no Worlds found!"
+                }
+            }
+
+            return worlds
+        } catch (error) {
+            console.log(error)
+
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later."
+            }
+        }
     }
 
     // Return Information about a World specified by a provided ID
@@ -131,8 +148,20 @@ class PublicController {
                     error: "A World with that ID does not exist!"
                 }
             }
+
             return world
         } catch (error) {
+            if (
+                error.code === "ER_SIGNAL_EXCEPTION" &&
+                error.sqlState === "45000" &&
+                error.message === "World not found"
+            ) {
+                ctx.set.status = 404
+                return {
+                    error: "A World with that ID does not exist!"
+                }
+            }
+
             console.log(error)
             ctx.set.status = 500
             return {

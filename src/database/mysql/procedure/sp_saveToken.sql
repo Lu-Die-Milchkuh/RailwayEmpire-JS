@@ -2,9 +2,9 @@ USE Railway;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS `sp_saveToken`;
+DROP PROCEDURE IF EXISTS sp_saveToken;
 
-CREATE PROCEDURE `sp_saveToken`(IN jsonData JSON)
+CREATE PROCEDURE sp_saveToken(IN jsonData JSON)
 BEGIN
     DECLARE v_username VARCHAR(255);
     DECLARE v_token VARCHAR(255);

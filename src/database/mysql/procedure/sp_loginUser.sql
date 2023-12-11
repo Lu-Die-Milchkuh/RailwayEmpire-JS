@@ -2,9 +2,9 @@ USE Railway;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS `sp_loginUser`;
+DROP PROCEDURE IF EXISTS sp_loginUser;
 
-CREATE PROCEDURE `sp_loginUser`(IN user JSON)
+CREATE PROCEDURE sp_loginUser(IN user JSON)
 BEGIN
     DECLARE v_username VARCHAR(255);
 

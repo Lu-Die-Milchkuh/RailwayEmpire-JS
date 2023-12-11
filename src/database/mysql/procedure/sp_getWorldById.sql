@@ -2,9 +2,9 @@ USE Railway;
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS `sp_getWorldById`;
+DROP PROCEDURE IF EXISTS sp_getWorldById;
 
-CREATE PROCEDURE `sp_getWorldById`(IN id INT)
+CREATE PROCEDURE sp_getWorldById(IN id INT)
 BEGIN
     -- Declare variables to hold world information
     DECLARE v_world_id INT;

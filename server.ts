@@ -26,6 +26,7 @@
 import { Elysia } from "elysia"
 import swagger from "@elysiajs/swagger"
 import { jwt } from "@elysiajs/jwt"
+import { cors } from "@elysiajs/cors"
 import dbHandler from "./src/database/dbHandler"
 
 // Route Plugins
@@ -38,6 +39,7 @@ const db = await dbHandler.createConnection()
 const app = new Elysia()
 
 app.use(swagger())
+app.use(cors())
 app.use(
     jwt({
         name: "jwt",
