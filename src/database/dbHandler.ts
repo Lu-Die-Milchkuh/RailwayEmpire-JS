@@ -122,6 +122,11 @@ class dbHandler {
         const query = "CALL sp_getWorldById(?);"
         return await this.connection.execute(query, [id])
     }
+
+    async getAllAssets(token) {
+        const query = "CALL sp_getAllAssets(?);"
+        return await this.connection.execute(query, [token])
+    }
 }
 
 export default dbHandler

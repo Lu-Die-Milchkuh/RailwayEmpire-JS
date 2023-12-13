@@ -1,0 +1,13 @@
+USE Railway;
+
+DELIMITER $$
+
+DROP EVENT IF EXISTS ev_cleanupToken;
+
+-- cleanup token table every day
+CREATE EVENT ev_cleanupToken ON SCHEDULE EVERY 1 DAY STARTS CURRENT_TIMESTAMP DO
+BEGIN
+    DELETE FROM Token WHERE created < DATE_SUB(NOW(), INTERVAL 1 DAY);
+END$$
+
+DELIMITER ;

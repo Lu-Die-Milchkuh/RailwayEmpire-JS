@@ -56,10 +56,9 @@ BEGIN
     INTO v_numberOfPlayers
     FROM World
              INNER JOIN Railway.User ON World.worldID = User.worldIDFK
-    WHERE worldID = v_lastWorldID;
-    -- SELECT worldID INTO v_worldID FROM World WHERE v_numberOfPlayers < 5 LIMIT 1;
+    WHERE worldID = v_worldID;
 
-    IF v_numberOfPlayers <= 5 THEN
+    IF v_numberOfPlayers = 5 THEN
         CALL sp_createWorld(v_worldID);
     END IF;
 
@@ -72,6 +71,7 @@ END $$
 
 DELIMITER ;
 
+/*
 CALL sp_registerUser('{
   "username": "test1",
   "password": "test"
@@ -97,4 +97,5 @@ CALL sp_registerUser('{
   "username": "test6",
   "password": "test"
 }');
+ */
 

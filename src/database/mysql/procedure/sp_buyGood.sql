@@ -1,0 +1,12 @@
+USE Railway;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_buyGood;
+
+CREATE PROCEDURE sp_buyGood()
+BEGIN
+
+END $$
+
+DELIMITER ;

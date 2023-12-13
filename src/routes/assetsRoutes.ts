@@ -48,7 +48,15 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
             })
         })
     })
-    .get("/", assetController.getAllAssets, { beforeHandle: validateToken })
+    .get("/", assetController.getAllAssets, {
+        beforeHandle: validateToken
+        // body: t.Object({}),
+        // error({}) {
+        //     return {
+        //         error: "Did not expect a Body!"
+        //     }
+        // }
+    })
     .group("/town", (plugin) =>
         plugin.get("/", assetController.getAllTowns).guard(
             {

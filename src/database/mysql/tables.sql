@@ -29,7 +29,7 @@ CREATE TABLE
     tokenID  INT AUTO_INCREMENT PRIMARY KEY,
     userIDFK INT          NOT NULL,
     token    VARCHAR(512) NOT NULL,
-    expires DATETIME DEFAULT (CURRENT_TIMESTAMP + INTERVAL 1 DAY),
+    created DATETIME     DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userIDFK) REFERENCES User (userID) ON DELETE CASCADE
 );
 
@@ -47,13 +47,15 @@ CREATE TABLE
 (
     assetID    INT AUTO_INCREMENT PRIMARY KEY,
     type       ENUM ('TOWN', 'RANCH', 'FIELD', 'FARM', 'LUMBERYARD','PLANTATION','MINE') NOT NULL,
-    name       VARCHAR(255),
+    name       VARCHAR(255) DEFAULT 'Unnamed',
     population INT DEFAULT 0,
     position   POINT                                                                     NOT NULL,
     level      INT DEFAULT 1,
-    cost      FLOAT NOT NULL ,
+    cost       FLOAT NOT NULL ,
     costPerDay FLOAT NOT NULL,
+    worldIDFK  INT,
     userIDFK   INT,
+    FOREIGN KEY (worldIDFK) REFERENCES World (worldID) ON DELETE CASCADE,
     FOREIGN KEY (userIDFK) REFERENCES User (userID) ON DELETE CASCADE
 );
 
@@ -86,6 +88,8 @@ CREATE TABLE
         'SMELTER', 'SMITHY', 'JEWELER'
         )          NOT NULL,
     assetIDFK  INT NOT NULL,
+    cost FLOAT DEFAULT 500000,
+    costPerDay FLOAT DEFAULT 500,
     FOREIGN KEY (assetIDFK) REFERENCES Asset (assetID) ON DELETE CASCADE
 );
 

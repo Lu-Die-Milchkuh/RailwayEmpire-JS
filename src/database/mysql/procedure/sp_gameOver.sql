@@ -1,0 +1,12 @@
+USE Railyway;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_gameOver;
+
+CREATE PROCEDURE sp_gameOver(IN userID INT)
+BEGIN
+
+END $$
+
+DELIMITER ;

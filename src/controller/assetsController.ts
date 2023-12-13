@@ -46,7 +46,30 @@ enum INDUSTRY {
 }
 
 class AssetController {
-    async getAllAssets(ctx) {}
+    async getAllAssets(ctx) {
+        const db = ctx.db
+        const token = ctx.headers["authorization"]
+
+        try {
+            const result = await db.getAllAssets(token)
+
+            const assets = result[0][0][0]?.Assets
+
+            if (!assets) {
+                ctx.set.status = 404
+                return {
+                    error: "No Assets found :("
+                }
+            }
+            return assets
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+        }
+    }
 
     //************** Town **************
     async buyTown(ctx) {

@@ -1,0 +1,16 @@
+USE Railway;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_buyRailway;
+
+CREATE PROCEDURE sp_buyRailway(IN jsonData JSON)
+BEGIN
+
+
+
+
+
+END$$
+
+DELIMITER ;
