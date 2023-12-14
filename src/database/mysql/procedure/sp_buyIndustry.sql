@@ -43,9 +43,7 @@ BEGIN
 
     UPDATE User SET funds = v_funds - v_industryCost WHERE userID = v_userID;
 
-
     INSERT INTO Industry (assetIDFK) VALUES (v_townID);
-
 
 END$$
 

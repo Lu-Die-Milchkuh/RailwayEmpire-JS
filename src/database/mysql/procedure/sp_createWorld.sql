@@ -21,12 +21,7 @@ BEGIN
         SET @i = @i + 1;
     END WHILE;
 
-    SET @i = 0;
-
-    WHILE @i < @numberOfBusiness DO
-        CALL sp_createBusiness(v_worldId);
-        SET @i = @i + 1;
-    END WHILE;
+    CALL sp_createBusiness(v_worldId);
 
     SELECT MAX(worldId) INTO p_worldId FROM World;
 END $$
