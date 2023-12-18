@@ -44,7 +44,9 @@ This will pull and install all the necessary packages for the API to function pr
     DB_PASSWORD="your_password"
     DB_NAME="your_database_name"
     DB_HOST="127.0.0.1"
-    DB_PORT=3306 
+    DB_PORT=3306
+     
+    JWT_SECRET="your_secret"
     ```
 2. Then start the server:
 
