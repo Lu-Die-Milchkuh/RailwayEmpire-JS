@@ -22,43 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import Elysia from "elysia"
+import PlayerController from "../controller/playerController"
+import { validateToken } from "../auth/tokenAuth"
 
-import { Elysia } from "elysia"
-import swagger from "@elysiajs/swagger"
-import { jwt } from "@elysiajs/jwt"
-import { cors } from "@elysiajs/cors"
-import dbHandler from "./src/database/dbHandler"
+const playerController = new PlayerController()
 
-// Route Plugins
-import publicRoutesPlugin from "./src/routes/publicRoutes"
-import assetRoutesPlugin from "./src/routes/assetsRoutes"
-import goodsRoutesPlugin from "./src/routes/goodsRoutes"
-import playerRoutesPlugin from "./src/routes/playerRoutes"
-
-const PORT = Bun.env.HTTP_PORT || 8080
-const db = await dbHandler.createConnection()
-const app = new Elysia()
-
-app.use(swagger())
-app.use(cors())
-app.use(
-    jwt({
-        name: "jwt",
-        secret: Bun.env.JWT_SECRET || "I use Arch btw",
-        exp: "1d" // Expires in 24H
+const playerRoutesPlugin = new Elysia()
+    .get("/player/:id", playerController.getPlayerByID, {
+        beforeHandle: validateToken
     })
-)
+    .post("/player/delete", () => {}, { beforeHandle: validateToken })
 
-// Populate the routes
-app.use(publicRoutesPlugin)
-app.use(assetRoutesPlugin)
-app.use(goodsRoutesPlugin)
-app.use(playerRoutesPlugin)
-
-// Decorations can be used to bind
-// an Object to the "context" Object of the Elysia instance
-app.decorate("db", db)
-
-app.listen(PORT, () => {
-    console.log(`Server is up and listening on Port: ${PORT}`)
-})
+export default playerRoutesPlugin

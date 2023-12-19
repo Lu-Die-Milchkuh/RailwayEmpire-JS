@@ -50,56 +50,56 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
     })
     .get("/", assetController.getAllAssets, {
         beforeHandle: validateToken
-        // body: t.Object({}),
-        // error({}) {
-        //     return {
-        //         error: "Did not expect a Body!"
-        //     }
-        // }
     })
-    .group("/town", (plugin) =>
-        plugin.get("/", assetController.getAllTowns).guard(
-            {
+    .group("/town", { beforeHandle: validateToken }, (plugin) =>
+        plugin
+            .get("/", assetController.getAllTowns)
+            .get(":id", assetController.getTownByID)
+            .post("/", assetController.buyTown, {
                 body: t.Object({
-                    townID: t.Number(),
-                    name: t.Optional(t.String())
+                    assetID: t.Number()
                 }),
-                error({}) {
-                    return {
-                        error: "You need to provide a valid TownID and optional a name!"
-                    }
-                },
-                beforeHandle: validateToken
-            },
-            (plugin) =>
+                response: {
+                    200: "Town",
+                    404: t.Object({ error: t.String() })
+                }
+            })
+            .group("/industry", (plugin) =>
                 plugin
-                    .post("/", assetController.buyTown, {
-                        response: {
-                            200: "Town",
-                            404: t.Object({ error: t.String() })
-                        }
+                    .get("/", assetController.getIndustry)
+                    .get("/:id", assetController.getIndustryByID)
+                    .post("/", assetController.buyIndustry, {
+                        body: t.Object({
+                            assetID: t.Number()
+                        })
                     })
-                    .group("/industry", (plugin) =>
+            )
+            .group("/station", (plugin) =>
+                plugin
+                    .get("/", assetController.getAllStations)
+                    .get("/:id", assetController.getStationByID)
+                    .post("/", assetController.buyStation, {
+                        body: t.Object({
+                            assetID: t.Number()
+                        })
+                    })
+                    .group("/railway", (plugin) =>
                         plugin
-                            .get("/", assetController.getAllIndustries)
-                            .get("/:id", assetController.getIndustryByID)
-                            .post("/", assetController.buyIndustry)
+                            .get("/", assetController.getRailway)
+                            .post("/", assetController.buyRailway, {
+                                body: t.Object({
+                                    src: t.Number(),
+                                    dst: t.Number()
+                                })
+                            })
                     )
-                    .group("/station", (plugin) =>
+                    .group("/train", (plugin) =>
                         plugin
-                            .get("/", assetController.getAllStations)
-                            .get("/:id", assetController.getStationByID)
-                            .get("/track", assetController.getTrack)
-                            .post("/track", assetController.buyTrack)
-                            .post("/", assetController.buyStation)
-                            .group("/train", (plugin) =>
-                                plugin
-                                    .get("/", assetController.getTrains)
-                                    .get("/:id", assetController.getTrainByID)
-                                    .post("/", assetController.buyTrain)
-                            )
+                            .get("/", assetController.getTrains)
+                            .get("/:id", assetController.getTrainByID)
+                            .post("/", assetController.buyTrain)
                     )
-        )
+            )
     )
     .group("/business", { beforeHandle: validateToken }, (plugin) =>
         plugin
@@ -108,7 +108,7 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
             .guard(
                 {
                     body: t.Object({
-                        businessID: t.Number()
+                        assetID: t.Number()
                     })
                 },
                 (plugin) =>

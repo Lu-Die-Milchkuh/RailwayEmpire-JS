@@ -38,7 +38,6 @@ const Player = t.Object({
 const World = t.Object({
     worldID: t.Number(),
     creationDate: t.String(),
-    numberOfPlayers: t.Number(),
     players: t.Array(Player)
 })
 

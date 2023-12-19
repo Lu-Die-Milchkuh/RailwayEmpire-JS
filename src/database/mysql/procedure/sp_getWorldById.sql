@@ -13,8 +13,8 @@ BEGIN
     DECLARE v_players_json JSON;
 
     -- Select world information based on the given worldID
-    SELECT worldID, creationDate, numberOfPlayers
-    INTO v_world_id, v_creation_date, v_number_of_players
+    SELECT worldID, creationDate
+    INTO v_world_id, v_creation_date
     FROM World
     WHERE worldID = id;
 
@@ -35,7 +35,6 @@ BEGIN
     SELECT JSON_OBJECT(
         'worldID', v_world_id,
         'creationDate', v_creation_date,
-        'numberOfPlayers', v_number_of_players,
         'players', v_players_json
     ) as world;
 

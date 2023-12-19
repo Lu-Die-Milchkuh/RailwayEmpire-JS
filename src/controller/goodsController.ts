@@ -42,6 +42,10 @@ export enum GoodType {
     TOOLS
 }
 
+function isGood(type: string): type is GoodType {
+    return Object.values(GoodType).includes(type as GoodType)
+}
+
 class GoodsController {
     async sellGood(ctx) {
         const db = ctx.db
@@ -49,7 +53,12 @@ class GoodsController {
         const token = ctx.headers["authorization"]
 
         try {
-            if (type in GoodType) {
+            console.log(isGood(GoodType.BEVERAGE))
+            if (isGood(type)) {
+                ctx.set.status = 400
+                return {
+                    error: "Invalid Good Type!"
+                }
             }
             await db.sellGood(token, type, amount)
         } catch (error) {

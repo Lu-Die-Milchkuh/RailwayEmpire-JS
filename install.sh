@@ -1,7 +1,12 @@
 #!/bin/bash
 
+mysql_procedure_directory="./src/database/mysql/procedure"
+
+for sql_file in "$mysql_procedure_directory/*.sql";do
+  echo $sql_file
+done
+
 echo "Welcome to the RailwayEmpire Installer!"
-echo "Installing..."
 
 if ! command -v curl > /dev/null 2>&1; then
   echo "Please install curl before proceeding!"
@@ -24,6 +29,16 @@ if ! command -v mysql > /dev/null 2>&1; then
 else
   echo "Mysql found: $(which mysql)"
 fi
+
+echo "Setting up Database..."
+
+echo "Creating Tables.."
+
+echo "Loading Stored Procedures..."
+
+echo "Loading Events..."
+
+echo "Done."
 
 echo "Installing dependencies..."
 

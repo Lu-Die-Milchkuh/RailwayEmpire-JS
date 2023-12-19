@@ -14,7 +14,6 @@ BEGIN
         JSON_OBJECT(
             'worldID', worldID,
             'creationDate', creationDate,
-            'numberOfPlayers', numberOfPlayers,
             'players', (
                 SELECT JSON_ARRAYAGG(
                     JSON_OBJECT('userID', userID, 'username', username, 'funds', funds, 'joinDate', joinDate)

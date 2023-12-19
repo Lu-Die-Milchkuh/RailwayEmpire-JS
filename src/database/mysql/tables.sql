@@ -39,7 +39,7 @@ CREATE TABLE
     goodID INT AUTO_INCREMENT PRIMARY KEY,
     type   ENUM ('MAIL','PASSENGER','FRUIT','WHEAT','CATTLE','GRAIN','WOOD','MILK','PLANKS','LEATHER','WOOL','ORE','TOOLS','GEMS','BEVERAGE','MEAT','BREAD','CHEESE','FURNITURE','CLOTHING','METALS','JEWELLERY') NOT NULL,
     amount INT                                                                                                                                                                                                                      NOT NULL,
-    price  FLOAT                                                                                                                                                                                                                      NOT NULL
+    price  FLOAT
 );
 
 CREATE TABLE
@@ -118,6 +118,27 @@ CREATE TABLE
 );
 
 CREATE TABLE
+    Stockpile
+(
+    assetIDFK INT NOT NULL,
+    goodIDFK  INT NOT NULL,
+    amount    INT NOT NULL,
+    FOREIGN KEY (assetIDFK) REFERENCES Asset (assetID) ON DELETE CASCADE,
+    FOREIGN KEY (goodIDFK) REFERENCES Good (goodID) ON DELETE CASCADE
+);
+
+CREATE TABLE
+    Needs
+(
+    needsID INT AUTO_INCREMENT PRIMARY KEY,
+    assetIDFK INT NOT NULL,
+    goodIDFK  INT NOT NULL,
+    amount    INT NOT NULL,
+    FOREIGN KEY (assetIDFK) REFERENCES Asset (assetID) ON DELETE CASCADE,
+    FOREIGN KEY (goodIDFK) REFERENCES Good (goodID) ON DELETE CASCADE
+);
+
+CREATE TABLE
     Train
 (
     trainID    INT AUTO_INCREMENT PRIMARY KEY,
@@ -137,4 +158,3 @@ CREATE TABLE
     FOREIGN KEY (trainIDFK) REFERENCES Train (trainID) ON DELETE CASCADE,
     FOREIGN KEY (goodIDFK) REFERENCES Good (goodID) ON DELETE CASCADE
 );
-

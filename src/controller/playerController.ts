@@ -22,3 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+class PlayerController {
+    async getPlayerByID(ctx) {
+        const db = ctx.db
+        const id = ctx.params.id
+
+        try {
+            const result = await db.getPlayerByID(id)
+            const player = result[0][0][0]?.Player
+
+            if (!player) {
+                ctx.set.status = 404
+                return {
+                    error: "A Player with that ID does not exist"
+                }
+            }
+
+            return player
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server Error! Try again later!"
+            }
+        }
+    }
+}
+
+export default PlayerController
