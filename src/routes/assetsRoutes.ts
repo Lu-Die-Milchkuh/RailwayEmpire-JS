@@ -48,9 +48,11 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
             })
         })
     })
+
     .get("/", assetController.getAllAssets, {
         beforeHandle: validateToken
     })
+
     .group("/town", { beforeHandle: validateToken }, (plugin) =>
         plugin
             .get("/", assetController.getAllTowns)
@@ -74,61 +76,47 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
                         })
                     })
             )
-            .group("/station", (plugin) =>
-                plugin
-                    .get("/", assetController.getAllStations)
-                    .get("/:id", assetController.getStationByID)
-                    .post("/", assetController.buyStation, {
-                        body: t.Object({
-                            assetID: t.Number()
-                        })
-                    })
-                    .group("/railway", (plugin) =>
-                        plugin
-                            .get("/", assetController.getRailway)
-                            .post("/", assetController.buyRailway, {
-                                body: t.Object({
-                                    src: t.Number(),
-                                    dst: t.Number()
-                                })
-                            })
-                    )
-                    .group("/train", (plugin) =>
-                        plugin
-                            .get("/", assetController.getTrains)
-                            .get("/:id", assetController.getTrainByID)
-                            .post("/", assetController.buyTrain)
-                    )
-            )
     )
+
     .group("/business", { beforeHandle: validateToken }, (plugin) =>
         plugin
             .get("/", assetController.getAllBusiness)
             .get("/:id", assetController.getBusinessByID)
-            .guard(
-                {
-                    body: t.Object({
-                        assetID: t.Number()
+            .post("/", assetController.buyBusiness, {
+                body: t.Object({
+                    assetID: t.Number()
+                })
+            })
+    )
+
+    .group("/station", (plugin) =>
+        plugin
+            .get("/", assetController.getStation)
+            .get("/:id", assetController.getStationByID)
+            .post("/", assetController.buyStation, {
+                body: t.Object({
+                    assetID: t.Number()
+                })
+            })
+            .group("/railway", (plugin) =>
+                plugin
+                    .get("/", assetController.getRailway)
+                    .post("/", assetController.buyRailway, {
+                        body: t.Object({
+                            src: t.Number(),
+                            dst: t.Number()
+                        })
                     })
-                },
-                (plugin) =>
-                    plugin
-                        .post("/", assetController.buyBusiness)
-                        .group("/station", (plugin) =>
-                            plugin
-                                .get("/", assetController.getAllStations)
-                                .get("/:id", assetController.getStationByID)
-                                .post("/", assetController.buyStation)
-                                .group("/train", (plugin) =>
-                                    plugin
-                                        .get("/", assetController.buyTrain)
-                                        .get(
-                                            "/:id",
-                                            assetController.getTrainByID
-                                        )
-                                        .post("/", assetController.buyTrain)
-                                )
-                        )
+            )
+            .group("/train", (plugin) =>
+                plugin
+                    .get("/", assetController.getTrains)
+                    .get("/:id", assetController.getTrainByID)
+                    .post("/", assetController.buyTrain, {
+                        body: t.Object({
+                            assetID: t.Number()
+                        })
+                    })
             )
     )
 

@@ -23,8 +23,6 @@
  * SOFTWARE.
  */
 
-import assert from "assert"
-
 enum BUSINESS {
     RANCH,
     FIELD,
@@ -101,7 +99,31 @@ class AssetController {
         }
     }
 
-    async getTownByID(ctx) {}
+    async getTownByID(ctx) {
+        const db = ctx.db
+        const id = ctx.params.id
+
+        try {
+            const result = await db.getTownByID(id)
+
+            const town = result[0][0][0]?.Town
+
+            if (!town) {
+                ctx.set.status = 404
+                return {
+                    error: "No Town exists with that ID"
+                }
+            }
+
+            return town
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+        }
+    }
 
     async getAllTowns(ctx) {
         const db = ctx.db
@@ -128,10 +150,33 @@ class AssetController {
     }
 
     //************** Station **************
-    async buyStation(ctx) {}
+    async buyStation(ctx) {
+        const db = ctx.db
+        const assetID = ctx.body.assetID
+
+        try {
+            await db.buyStation(assetID)
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+        }
+    }
+
+    async getStation(ctx) {
+        if (typeof ctx.query.assetID !== "undefined") {
+            this.getStationForAsset(ctx)
+        } else {
+            this.getAllStations(ctx)
+        }
+    }
+
+    private async getStationForAsset(ctx) {}
 
     // Get all Stations that belong to a Town/Business
-    async getAllStations(ctx) {
+    private async getAllStations(ctx) {
         const db = ctx.db
 
         try {
@@ -240,7 +285,7 @@ class AssetController {
     async getIndustry(ctx) {
         // If Query Parameter exist,
         // only get Industries for that specific town
-        if (ctx.query.assetID) {
+        if (typeof ctx.query.assetID !== "undefined") {
             this.getIndustryForTown(ctx)
         } else {
             this.getAllIndustries(ctx)
