@@ -45,7 +45,8 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
             position: t.Object({
                 x: t.Number(),
                 y: t.Number()
-            })
+            }),
+            owner: t.String()
         })
     })
 
@@ -55,7 +56,7 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
 
     .group("/town", { beforeHandle: validateToken }, (plugin) =>
         plugin
-            .get("/", assetController.getAllTowns)
+            .get("/", assetController.getTowns)
             .get(":id", assetController.getTownByID)
             .post("/", assetController.buyTown, {
                 body: t.Object({

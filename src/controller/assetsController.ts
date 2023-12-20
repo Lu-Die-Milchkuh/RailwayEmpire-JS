@@ -48,7 +48,7 @@ enum INDUSTRY {
 class AssetController {
     async getAllAssets(ctx) {
         const db = ctx.db
-        const token = ctx.headers["authorization"]
+        const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
             const assets = await db.getAllAssets(token)
@@ -73,7 +73,7 @@ class AssetController {
     async buyTown(ctx) {
         const db = ctx.db
         const { assetID, name } = ctx.body
-        const token = ctx.headers["authorization"]
+        const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
             const owner = await db.isAssetFree(assetID)
@@ -100,7 +100,7 @@ class AssetController {
             }
 
             if (funds < cost) {
-                ctx.set.status = 401
+                ctx.set.status = 400
                 return {
                     error: "Not enough funds!"
                 }
@@ -117,6 +117,14 @@ class AssetController {
             return {
                 error: "Internal Server error! Please try again later"
             }
+        }
+    }
+
+    async getTowns(ctx) {
+        if (typeof ctx.query.worldID === "undefined") {
+            this.getTownsForWorld(ctx)
+        } else {
+            this.getAllTowns(ctx)
         }
     }
 
@@ -144,7 +152,7 @@ class AssetController {
         }
     }
 
-    async getTownsForWorld(ctx) {
+    private async getTownsForWorld(ctx) {
         const db = ctx.db
         const worldID = ctx.query.worldID
 
@@ -168,7 +176,7 @@ class AssetController {
         }
     }
 
-    async getAllTowns(ctx) {
+    private async getAllTowns(ctx) {
         const db = ctx.db
 
         try {
@@ -197,8 +205,7 @@ class AssetController {
         const assetID = ctx.body.assetID
 
         try {
-            const result = await db.buyStation(assetID)
-            const station = result[0][0][0]?.Station
+            const station = await db.buyStation(assetID)
 
             if (!station) {
                 ctx.set.status = 400
@@ -231,8 +238,7 @@ class AssetController {
         const assetID = ctx.query.assetID
 
         try {
-            const result = await db.getStationForAsset(assetID)
-            const station = result[0][0][0]?.Station
+            const station = await db.getStationForAsset(assetID)
 
             if (!station) {
                 ctx.set.status = 404

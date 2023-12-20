@@ -25,35 +25,15 @@
 
 import { Elysia, t } from "elysia"
 import PublicController from "../controller/publicController"
+import { User } from "../model/PlayerModel"
+import { World, Worlds } from "../model/WorldModel"
 
 const publicController = new PublicController()
 
-const Player = t.Object({
-    funds: t.Number(),
-    userID: t.Number(),
-    joinDate: t.String(),
-    username: t.String()
-})
-
-const World = t.Object({
-    worldID: t.Number(),
-    creationDate: t.String(),
-    players: t.Array(Player)
-})
-
 const publicRoutesPlugin = new Elysia()
-    // Schema of the required body
-    .model({
-        User: t.Object({
-            username: t.String(),
-            password: t.String()
-        }),
-        Player: Player,
-        World: World
-    })
     .guard(
         {
-            body: "User",
+            body: User,
             error({}) {
                 return {
                     error: "Invalid User Object! Must contain Username and Password only!"
@@ -79,13 +59,13 @@ const publicRoutesPlugin = new Elysia()
         plugin
             .get("/", publicController.getWorlds, {
                 response: {
-                    200: t.Array(World),
+                    200: Worlds,
                     404: t.Object({ error: t.String() })
                 }
             })
             .get("/:id", publicController.getWorldById, {
                 response: {
-                    200: "World",
+                    200: World,
                     404: t.Object({
                         error: t.String()
                     })

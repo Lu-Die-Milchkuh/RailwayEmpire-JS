@@ -166,6 +166,12 @@ class dbHandler {
         const result = await this.connection.execute(query, [id])
         return result[0][0][0]?.Player
     }
+
+    async buyStation(id) {
+        const query = "CALL sp_buyStation(?);"
+        const result = await this.connection.execute(query, [id])
+        return result[0][0][0]?.Station
+    }
 }
 
 export default dbHandler
