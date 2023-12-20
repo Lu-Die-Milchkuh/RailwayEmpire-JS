@@ -4,7 +4,7 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS sp_createWorld;
 
-CREATE PROCEDURE sp_createWorld(OUT p_worldId INT)
+CREATE PROCEDURE sp_createWorld()
 BEGIN
     DECLARE v_worldId INT;
     INSERT INTO World() VALUE ();
@@ -23,10 +23,6 @@ BEGIN
 
     CALL sp_createBusiness(v_worldId);
 
-    SELECT MAX(worldId) INTO p_worldId FROM World;
 END $$
 
 DELIMITER ;
-
-CALL sp_createWorld(@worldId);
-

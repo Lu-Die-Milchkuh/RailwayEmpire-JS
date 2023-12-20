@@ -89,7 +89,7 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
             })
     )
 
-    .group("/station", (plugin) =>
+    .group("/station", { beforeHandle: validateToken }, (plugin) =>
         plugin
             .get("/", assetController.getStation)
             .get("/:id", assetController.getStationByID)

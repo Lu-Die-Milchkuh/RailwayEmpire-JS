@@ -29,8 +29,7 @@ class PlayerController {
         const id = ctx.params.id
 
         try {
-            const result = await db.getPlayerByID(id)
-            const player = result[0][0][0]?.Player
+            const player = await db.getPlayerByID(id)
 
             if (!player) {
                 ctx.set.status = 404

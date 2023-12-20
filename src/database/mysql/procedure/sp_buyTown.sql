@@ -19,7 +19,7 @@ BEGIN
     END IF;
 
     SET v_token = JSON_EXTRACT(jsonData, '$.token');
-    SET v_townID = JSON_EXTRACT(jsonData, '$.townID');
+    SET v_townID = JSON_EXTRACT(jsonData, '$.assetID');
     SET v_name = JSON_EXTRACT(jsonData,'$.name');
 
     SELECT userIDFK INTO v_userID FROM Token WHERE token = v_token;
@@ -44,9 +44,11 @@ BEGIN
                    'owner', u.username,
                    'position', a.position,
                    'cost', a.cost
-           ) AS town
+           ) AS Town
     FROM Asset a
              JOIN User u ON a.userIDFK = u.userID
     WHERE a.assetID = v_townID;
 
 END$$
+
+DELIMITER ;

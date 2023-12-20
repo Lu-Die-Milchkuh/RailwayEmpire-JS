@@ -32,6 +32,12 @@ class PublicController {
         const password = ctx.body.password
 
         try {
+            const world = await db.getFreeWorld()
+
+            if (!world) {
+                await db.createNewWorld()
+            }
+
             const HASHED_PASSWORD = await Bun.password.hash(password, {
                 algorithm: "bcrypt"
             })
@@ -103,8 +109,7 @@ class PublicController {
         const db = ctx.db
 
         try {
-            const result = await db.getWorlds()
-            const worlds = result[0][0][0]?.worlds
+            const worlds = await db.getWorlds()
 
             if (!worlds) {
                 ctx.set.status = 404
@@ -139,8 +144,7 @@ class PublicController {
         }
 
         try {
-            const result = await db.getWorldById(id)
-            const world = result[0][0][0]?.world
+            const world = await db.getWorldById(id)
 
             if (!world) {
                 ctx.set.status = 404

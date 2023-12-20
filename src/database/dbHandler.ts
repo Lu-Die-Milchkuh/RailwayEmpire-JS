@@ -54,6 +54,23 @@ class dbHandler {
         this.connection = connection
     }
 
+    async getFreeWorld() {
+        const query = "CALL sp_getFreeWorld();"
+        const result = await this.connection.execute(query)
+        return result[0][0][0]?.World
+    }
+
+    async isAssetFree(assetID: number) {
+        const query = "CALL sp_isAssetFree(?);"
+        const result = await this.connection.execute(query, [assetID])
+        return result[0][0][0]?.Owner
+    }
+
+    async createNewWorld() {
+        const query = "CALL sp_createWorld();"
+        return await this.connection.execute(query)
+    }
+
     async register(username: string, password: string) {
         const query = "CALL sp_registerUser(?);"
         const jsonData = JSON.stringify({
@@ -103,34 +120,51 @@ class dbHandler {
         return await this.connection.execute(query, [jsonData])
     }
 
-    async buyTown(token: string, townID: number, name: string = "") {
+    async buyTown(token: string, townID: number, name: string = "unnamed") {
         const query = "Call sp_buyTown(?);"
         const jsonData = JSON.stringify({
             token: token,
-            townID: townID,
+            assetID: townID,
             name: name
         })
-        return await this.connection.execute(query, [jsonData])
+        const result = await this.connection.execute(query, [jsonData])
+        return result[0][0][0]?.Town
     }
 
     async getWorlds() {
         const query = "CALL sp_getAllWorlds();"
-        return await this.connection.execute(query)
+        const result = await this.connection.execute(query)
+        return result[0][0][0]?.Worlds
     }
 
     async getWorldById(id: number) {
         const query = "CALL sp_getWorldById(?);"
-        return await this.connection.execute(query, [id])
+        const result = await this.connection.execute(query, [id])
+        return result[0][0][0]?.World
     }
 
     async getAllAssets(token) {
         const query = "CALL sp_getAllAssets(?);"
-        return await this.connection.execute(query, [token])
+        const result = await this.connection.execute(query, [token])
+        return result[0][0][0]?.Assets
+    }
+
+    async getAllTowns() {
+        const query = "CALL sp_getAllTowns();"
+        const result = await this.connection.execute(query)
+        return result[0][0][0]?.Towns
+    }
+
+    async getTownByID(assetID) {
+        const query = "CALL sp_getTownByID(?)"
+        const result = this.connection.query(query, [assetID])
+        return result[0][0][0]?.Town
     }
 
     async getPlayerByID(id) {
         const query = "CALL sp_getPlayerByID(?);"
-        return await this.connection.execute(query, [id])
+        const result = await this.connection.execute(query, [id])
+        return result[0][0][0]?.Player
     }
 }
 

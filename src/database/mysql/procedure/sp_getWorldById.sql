@@ -9,7 +9,6 @@ BEGIN
     -- Declare variables to hold world information
     DECLARE v_world_id INT;
     DECLARE v_creation_date DATETIME;
-    DECLARE v_number_of_players INT;
     DECLARE v_players_json JSON;
 
     -- Select world information based on the given worldID
@@ -36,7 +35,7 @@ BEGIN
         'worldID', v_world_id,
         'creationDate', v_creation_date,
         'players', v_players_json
-    ) as world;
+    ) as World;
 
 END$$
 
