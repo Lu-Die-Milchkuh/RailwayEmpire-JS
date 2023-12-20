@@ -25,7 +25,7 @@
 
 async function validateToken(ctx) {
     const jwt = ctx.jwt
-    const token = ctx.headers["authorization"]
+    let token = ctx.headers["authorization"]
 
     console.log("Token: " + token)
 
@@ -35,6 +35,8 @@ async function validateToken(ctx) {
             error: "Unauthorized! Missing Token!"
         }
     }
+
+    token = token.replace("Bearer ", "")
 
     try {
         const profile = await jwt.verify(
