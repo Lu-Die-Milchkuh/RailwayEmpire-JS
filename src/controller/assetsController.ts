@@ -46,6 +46,11 @@ enum INDUSTRY {
 }
 
 class AssetController {
+    // constructor() {
+    //     this.getAllTowns = this.getAllTowns.bind(this)
+    //     this.getTownsForWorld = this.getTownsForWorld.bind(this)
+    // }
+
     async getAllAssets(ctx) {
         const db = ctx.db
         const token = ctx.headers["authorization"].replace("Bearer ", "")
@@ -108,9 +113,7 @@ class AssetController {
 
             const town = await db.buyTown(token, assetID, name)
 
-            return {
-                town: town
-            }
+            return town
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -120,11 +123,11 @@ class AssetController {
         }
     }
 
-    async getTowns(ctx) {
-        if (typeof ctx.query.worldID === "undefined") {
-            this.getTownsForWorld(ctx)
+    getTowns = async (ctx) => {
+        if (typeof ctx.query.worldID !== "undefined") {
+            return await this.getTownsForWorld(ctx)
         } else {
-            this.getAllTowns(ctx)
+            return await this.getAllTowns(ctx)
         }
     }
 
@@ -152,7 +155,7 @@ class AssetController {
         }
     }
 
-    private async getTownsForWorld(ctx) {
+    async getTownsForWorld(ctx) {
         const db = ctx.db
         const worldID = ctx.query.worldID
 
@@ -176,7 +179,7 @@ class AssetController {
         }
     }
 
-    private async getAllTowns(ctx) {
+    async getAllTowns(ctx) {
         const db = ctx.db
 
         try {
@@ -224,11 +227,11 @@ class AssetController {
         }
     }
 
-    async getStation(ctx) {
+    getStation = async (ctx) => {
         if (typeof ctx.query.assetID !== "undefined") {
-            this.getStationForAsset(ctx)
+            return await this.getStationForAsset(ctx)
         } else {
-            this.getAllStations(ctx)
+            return await this.getAllStations(ctx)
         }
     }
 
@@ -364,10 +367,19 @@ class AssetController {
     async buyIndustry(ctx) {
         const db = ctx.db
         const assetID = ctx.body.assetID
+        const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
-            const result = await db.buyIndustry(assetID)
-            const industry = result[0][0][0]?.Industry
+            const isOwner = await db.isOwner(token, assetID)
+
+            if (!isOwner) {
+                ctx.set.status = 401
+                return {
+                    error: "You are not the Owner of this Town!"
+                }
+            }
+
+            const industry = await db.buyIndustry(token, assetID)
 
             if (!industry) {
                 ctx.set.status = 401
@@ -387,19 +399,39 @@ class AssetController {
     }
 
     // Wrapper
-    async getIndustry(ctx) {
+    getIndustry = async (ctx) => {
         // If Query Parameter exist,
         // only get Industries for that specific town
         if (typeof ctx.query.assetID !== "undefined") {
-            this.getIndustryForTown(ctx)
+            return await this.getIndustryForTown(ctx)
         } else {
-            this.getAllIndustries(ctx)
+            return await this.getAllIndustries(ctx)
         }
     }
 
     // Returns an Array of all Industries associated with a specific town
-    private getIndustryForTown(ctx) {
+    private async getIndustryForTown(ctx) {
         const db = ctx.db
+        const assetID = ctx.query.assetID
+
+        try {
+            const industries = await db.getIndustryForTown(assetID)
+
+            if (!industries) {
+                ctx.set.status = 404
+                return {
+                    error: "Error! No Industries found!"
+                }
+            }
+
+            return industries
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+        }
     }
 
     // Returns all Industries the User owns
@@ -407,8 +439,7 @@ class AssetController {
         const db = ctx.db
 
         try {
-            const result = await db.getAllIndustries()
-            const industries = result[0][0][0]?.Industries
+            const industries = await db.getAllIndustries()
 
             if (!industries) {
                 ctx.set.status = 404
@@ -431,8 +462,7 @@ class AssetController {
         const db = ctx.db
         const id = ctx.params.id
         try {
-            const result = await db.getIndustryByID(id)
-            const industry = result[0][0][0]?.Industry
+            const industry = await db.getIndustryByID(id)
 
             if (!industry) {
                 ctx.set.status = 404
@@ -565,8 +595,7 @@ class AssetController {
         const db = ctx.db
 
         try {
-            const result = await db.getAllBusiness()
-            const business = result[0][0][0]?.Business
+            const business = await db.getAllBusiness()
 
             if (!business) {
                 ctx.set.sattus = 404

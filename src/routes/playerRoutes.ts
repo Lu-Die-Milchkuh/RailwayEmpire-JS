@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import Elysia from "elysia"
+import { Elysia, t } from "elysia"
 import PlayerController from "../controller/playerController"
 import { validateToken } from "../auth/tokenAuth"
 
@@ -30,7 +30,11 @@ const playerController = new PlayerController()
 
 const playerRoutesPlugin = new Elysia()
     .get("/player/:id", playerController.getPlayerByID, {
-        beforeHandle: validateToken
+        beforeHandle: validateToken,
+        response: {
+            200: "Player",
+            404: t.Object({ error: t.String() })
+        }
     })
     .post("/player/delete", () => {}, { beforeHandle: validateToken })
 

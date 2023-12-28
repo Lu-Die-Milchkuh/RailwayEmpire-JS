@@ -70,7 +70,12 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
             .group("/industry", (plugin) =>
                 plugin
                     .get("/", assetController.getIndustry)
-                    .get("/:id", assetController.getIndustryByID)
+                    .get("/:id", assetController.getIndustryByID, {
+                        response: {
+                            200: "Industry",
+                            404: t.Object({ error: t.String() })
+                        }
+                    })
                     .post("/", assetController.buyIndustry, {
                         body: t.Object({
                             assetID: t.Number()

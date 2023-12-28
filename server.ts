@@ -29,6 +29,8 @@ import { jwt } from "@elysiajs/jwt"
 import { cors } from "@elysiajs/cors"
 import dbHandler from "./src/database/dbHandler"
 
+import modelPlugin from "./src/model/modelPlugin"
+
 // Route Plugins
 import publicRoutesPlugin from "./src/routes/publicRoutes"
 import assetRoutesPlugin from "./src/routes/assetsRoutes"
@@ -48,6 +50,8 @@ app.use(
         exp: "1d" // Expires in 24H
     })
 )
+
+app.use(modelPlugin)
 
 // Populate the routes
 app.use(publicRoutesPlugin)

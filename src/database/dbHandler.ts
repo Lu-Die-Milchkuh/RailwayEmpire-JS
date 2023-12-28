@@ -25,6 +25,7 @@
 
 import mysql2 from "mysql2/promise"
 import { GoodType } from "../controller/goodsController"
+import { Query } from "mysql2/typings/mysql/lib/protocol/sequences/Query"
 
 type Town = {
     name: string
@@ -171,6 +172,30 @@ class dbHandler {
         const query = "CALL sp_buyStation(?);"
         const result = await this.connection.execute(query, [id])
         return result[0][0][0]?.Station
+    }
+
+    async getAllBusiness() {
+        const query = "CALL sp_getAllBusiness();"
+        const result = await this.connection.execute(query)
+        return result[0][0][0]?.Business
+    }
+
+    async getAllIndustries() {
+        const query = "CALL sp_getAllIndustries()"
+        const result = await this.connection.execute(query)
+        return result[0][0][0]?.Industries
+    }
+
+    async getIndustryByID(id) {
+        const query = "CALL sp_getIndustryByID(?);"
+        const result = await this.connection.execute(query, [id])
+        return result[0][0][0]?.Industry
+    }
+
+    async buyIndustry(userID, assetID) {
+        const query = "CALL sp_buyIndustry(?,?);"
+        const result = await this.connection.execute(query, [userID, assetID])
+        return result[0][0][0]?.Industry
     }
 }
 

@@ -1,6 +1,6 @@
 import { t } from "elysia"
 
-const Player = t.Object(
+export const Player = t.Object(
     {
         funds: t.Number(),
         userID: t.Number(),
@@ -17,7 +17,7 @@ const Player = t.Object(
     }
 )
 
-const User = t.Object(
+export const User = t.Object(
     {
         username: t.String(),
         password: t.String()
@@ -30,4 +30,4 @@ const User = t.Object(
     }
 )
 
-export { Player, User }
+// export { Player, User }
