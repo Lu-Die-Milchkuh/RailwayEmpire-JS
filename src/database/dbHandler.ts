@@ -197,6 +197,11 @@ class dbHandler {
         const result = await this.connection.execute(query, [userID, assetID])
         return result[0][0][0]?.Industry
     }
+
+    async buyTrain(assetID) {}
+    async getTrainByID(id) {}
+    async getTrainForStation(assetID) {}
+    async getAllTrains() {}
 }
 
 export default dbHandler

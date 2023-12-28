@@ -31,12 +31,12 @@ const goodsController = new GoodsController()
 
 const goodsRoutesPlugin = new Elysia({ prefix: "/goods" })
     // Schema of the required body
-    .model({
-        Good: t.Object({
-            type: t.String(),
-            amount: t.Number()
-        })
-    })
+    // .model({
+    //     Good: t.Object({
+    //         type: t.String(),
+    //         amount: t.Number()
+    //     })
+    // })
     .get("/", goodsController.getAllGoods, { beforeHandle: validateToken })
     .guard(
         {
@@ -50,10 +50,19 @@ const goodsRoutesPlugin = new Elysia({ prefix: "/goods" })
         (plugin) =>
             plugin
                 .post("/buy", goodsController.buyGood, {
-                    beforeHandle: validateToken
+                    beforeHandle: validateToken,
+                    body: "Good",
+                    response: {
+                        200: "Good",
+                        404: t.Object({ error: t.String() })
+                    }
                 })
                 .post("/sell", goodsController.sellGood, {
-                    beforeHandle: validateToken
+                    beforeHandle: validateToken,
+                    body: "Good",
+                    response: {
+                        404: t.Object({ error: t.String() })
+                    }
                 })
     )
 

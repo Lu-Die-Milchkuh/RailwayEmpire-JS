@@ -46,7 +46,8 @@ class PublicController {
 
             const token = await generateToken(ctx)
             return {
-                token: token
+                token: token,
+                worldID: world.worldID
             }
         } catch (error) {
             if (error.message === "Duplicate entry for username") {
@@ -91,9 +92,11 @@ class PublicController {
             const token = await jwt.sign(username)
 
             await db.saveToken(username, token)
+            const world = await db.getWorldForUser(username)
 
             return {
-                token: token
+                token: token,
+                worldID: world.worldID
             }
         } catch (error) {
             console.log(error)

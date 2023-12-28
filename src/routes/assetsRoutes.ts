@@ -123,6 +123,11 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
                             assetID: t.Number()
                         })
                     })
+                    .group("/wagon", (plugin) =>
+                        plugin
+                            .get("/", assetController.getWagon)
+                            .post("/", assetController.fillWagon)
+                    )
             )
     )
 

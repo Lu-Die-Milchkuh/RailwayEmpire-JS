@@ -42,13 +42,19 @@ const publicRoutesPlugin = new Elysia()
             plugin
                 .post("/register", publicController.register, {
                     response: {
-                        200: t.Object({ token: t.String() }),
+                        200: t.Object({
+                            token: t.String(),
+                            worldID: t.Number()
+                        }),
                         400: t.Object({ error: t.String() })
                     }
                 })
                 .post("/login", publicController.login, {
                     response: {
-                        200: t.Object({ token: t.String() }),
+                        200: t.Object({
+                            token: t.String(),
+                            worldID: t.Number()
+                        }),
                         404: t.Object({ error: t.String() })
                     }
                 })

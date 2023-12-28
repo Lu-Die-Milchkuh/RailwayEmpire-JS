@@ -663,6 +663,53 @@ class AssetController {
             }
         }
     }
+
+    async getWagon(ctx) {
+        const db = ctx.db
+        try {
+            const wagons = await db.getWagons()
+
+            if (!wagons) {
+                ctx.set.status = 404
+                return {
+                    error: "Looks like you dont have any wagons!"
+                }
+            }
+
+            return wagons
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+        }
+    }
+
+    async fillWagon(ctx) {
+        const db = ctx.db
+
+        try {
+            const { trainID, type, amount } = ctx.body
+
+            const trainExists = await db.trainExist(trainID)
+
+            if (!trainExists) {
+                ctx.set.status = 404
+                return {
+                    error: "A Train with that ID does not exist"
+                }
+            }
+
+            await db.fillTrain(trainID, type, amount)
+        } catch (error) {
+            console.log(error)
+            ctx.set.status = 500
+            return {
+                error: "Internal Server error! Please try again later"
+            }
+        }
+    }
 }
 
 export default AssetController
