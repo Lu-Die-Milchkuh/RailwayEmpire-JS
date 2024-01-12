@@ -4,18 +4,8 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS sp_getAllAssets;
 
-CREATE PROCEDURE sp_getAllAssets(IN token VARCHAR(512))
+CREATE PROCEDURE sp_getAllAssets(IN p_worldID INT)
 BEGIN
-    DECLARE v_userID INT;
-    DECLARE v_worldID INT;
-
-    SELECT userID
-    INTO v_userID
-    FROM User
-             INNER JOIN Token ON User.userID = Token.userIDFK
-    WHERE Token.token = token;
-
-    SELECT worldIDFK INTO v_worldID FROM User WHERE userID = v_userID;
 
     SELECT JSON_ARRAYAGG(
                    JSON_OBJECT(
@@ -30,10 +20,14 @@ BEGIN
                            'cost', cost,
                            'costPerDay', costPerDay,
                            'userID', userIDFK
+
                    )
            ) AS Assets
-    FROM Asset;
+    FROM Asset WHERE worldIDFK = p_worldID;
 
 END$$
 
 DELIMITER ;
+
+CALL sp_getAllAssets(35);
+

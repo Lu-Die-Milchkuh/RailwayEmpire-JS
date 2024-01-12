@@ -23,32 +23,16 @@
  * SOFTWARE.
  */
 
+/*
+ * WARNING: Prepare for some nasty nesting :)
+ */
 import { Elysia, t } from "elysia"
 import AssetController from "../controller/assetsController"
 import { validateToken } from "../auth/tokenAuth"
 
 const assetController = new AssetController()
 
-const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
-    .model({
-        Town: t.Object({
-            assetID: t.Number(),
-            name: t.String(),
-            position: t.Object({
-                x: t.Number(),
-                y: t.Number()
-            }),
-            owner: t.String()
-        }),
-        Business: t.Object({
-            type: t.String(),
-            position: t.Object({
-                x: t.Number(),
-                y: t.Number()
-            }),
-            owner: t.String()
-        })
-    })
+const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
 
     .get("/", assetController.getAllAssets, {
         beforeHandle: validateToken
@@ -56,77 +40,124 @@ const assetRoutesPlugin = new Elysia({ prefix: "/asset" })
 
     .group("/town", { beforeHandle: validateToken }, (plugin) =>
         plugin
-            .get("/", assetController.getTowns)
-            .get(":id", assetController.getTownByID)
-            .post("/", assetController.buyTown, {
-                body: t.Object({
-                    assetID: t.Number()
-                }),
-                response: {
-                    200: "Town",
-                    404: t.Object({ error: t.String() })
-                }
-            })
-            .group("/industry", (plugin) =>
+            .get("/", assetController.getAllTowns)
+            .group(":assetID", (plugin) =>
                 plugin
-                    .get("/", assetController.getIndustry)
-                    .get("/:id", assetController.getIndustryByID, {
+                    .get("/", assetController.getTownByID)
+                    .post("/", assetController.buyTown, {
+                        body: t.Optional(
+                            t.Object({
+                                name: t.String({
+                                    description: "Optional Name for your Town"
+                                })
+                            })
+                        ),
                         response: {
-                            200: "Industry",
+                            200: "Town",
                             404: t.Object({ error: t.String() })
                         }
                     })
-                    .post("/", assetController.buyIndustry, {
-                        body: t.Object({
-                            assetID: t.Number()
-                        })
-                    })
+                    .group("/industry", (plugin) =>
+                        plugin
+                            .get("/", assetController.getAllIndustries)
+                            .get(
+                                ":industryID",
+                                assetController.getIndustryByID,
+                                {
+                                    response: {
+                                        200: "Industry",
+                                        404: t.Object({ error: t.String() })
+                                    }
+                                }
+                            )
+                            .post("/", assetController.buyIndustry)
+                    )
+                    .group("station", (plugin) =>
+                        plugin
+                            .get("/", assetController.getAllStations)
+                            .post("/", assetController.buyStation)
+                            .get(":stationID", assetController.getStationByID)
+                            .group(":stationID/railway", (plugin) =>
+                                plugin
+                                    .get("/", assetController.getAllRailways)
+                                    .post(
+                                        "/:destStationID",
+                                        assetController.buyRailway
+                                    )
+                            )
+                            .group(":stationID/train", (plugin) =>
+                                plugin
+                                    .get("/", assetController.getAllTrains)
+                                    .get(
+                                        ":trainID",
+                                        assetController.getTrainByID
+                                    )
+                                    .post("/", assetController.buyTrain)
+                                    .post(
+                                        ":trainID/send",
+                                        assetController.sendTrain,
+                                        {
+                                            body: t.Object({
+                                                stationID: t.Number({
+                                                    description:
+                                                        "The ID of the DESTINATION Station"
+                                                })
+                                            })
+                                        }
+                                    )
+                                    .get(
+                                        ":trainID/wagon",
+                                        assetController.getWagon
+                                    )
+                            )
+                    )
             )
     )
-
     .group("/business", { beforeHandle: validateToken }, (plugin) =>
         plugin
             .get("/", assetController.getAllBusiness)
-            .get("/:id", assetController.getBusinessByID)
-            .post("/", assetController.buyBusiness, {
-                body: t.Object({
-                    assetID: t.Number()
-                })
-            })
-    )
-
-    .group("/station", { beforeHandle: validateToken }, (plugin) =>
-        plugin
-            .get("/", assetController.getStation)
-            .get("/:id", assetController.getStationByID)
-            .post("/", assetController.buyStation, {
-                body: t.Object({
-                    assetID: t.Number()
-                })
-            })
-            .group("/railway", (plugin) =>
+            .group(":assetID", (plugin) =>
                 plugin
-                    .get("/", assetController.getRailway)
-                    .post("/", assetController.buyRailway, {
-                        body: t.Object({
-                            src: t.Number(),
-                            dst: t.Number()
-                        })
-                    })
-            )
-            .group("/train", (plugin) =>
-                plugin
-                    .get("/", assetController.getTrains)
-                    .get("/:id", assetController.getTrainByID)
-                    .post("/", assetController.buyTrain, {
-                        body: t.Object({
-                            assetID: t.Number()
-                        })
-                    })
-                    .group("/wagon", (plugin) =>
+                    .get("/", assetController.getBusinessByID)
+                    .post("/", assetController.buyBusiness)
+                    .group("/station", (plugin) =>
                         plugin
-                            .get("/", assetController.getWagon)
-                            .post("/", assetController.fillWagon)
+                            .get("/", assetController.getAllStations)
+                            .get("/:stationID", assetController.getStationByID)
+                            .post("/", assetController.buyStation)
+                            .group(":stationID/railway", (plugin) =>
+                                plugin
+                                    .get("/", assetController.getAllRailways)
+                                    .post(
+                                        "/:destStationID",
+                                        assetController.buyRailway
+                                    )
+                            )
+                            .group(":stationID/train", (plugin) =>
+                                plugin
+                                    .get("/", assetController.getAllTrains)
+                                    .get(
+                                        "/:trainID",
+                                        assetController.getTrainByID
+                                    )
+                                    .post("/", assetController.buyTrain)
+                                    .post(
+                                        "/:trainID/send",
+                                        assetController.sendTrain,
+                                        {
+                                            body: t.Object({
+                                                stationID: t.Number({
+                                                    description:
+                                                        "The ID of the DESTINATION Station"
+                                                })
+                                            })
+                                        }
+                                    )
+                                    .get(
+                                        ":trainID/wagon",
+                                        assetController.getWagon
+                                    )
+                            )
                     )
             )
     )

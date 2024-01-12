@@ -25,15 +25,6 @@
 
 import mysql2 from "mysql2/promise"
 import { GoodType } from "../controller/goodsController"
-import { Query } from "mysql2/typings/mysql/lib/protocol/sequences/Query"
-
-type Town = {
-    name: string
-    position: {
-        x: number
-        y: number
-    }
-}
 
 const DB_CRED = {
     host: Bun.env.DB_HOST || "localhost",
@@ -78,7 +69,8 @@ class dbHandler {
             username: username,
             password: password
         })
-        return await this.connection.execute(query, [jsonData])
+        const result = await this.connection.execute(query, [jsonData])
+        return result[0][0][0]?.Player
     }
 
     async login(username: string) {
@@ -86,7 +78,8 @@ class dbHandler {
         const jsonData = JSON.stringify({
             username: username
         })
-        return await this.connection.execute(query, [jsonData])
+        const result = await this.connection.execute(query, [jsonData])
+        return result[0][0][0]?.Player
     }
 
     async saveToken(username: string, token: string) {
@@ -98,7 +91,31 @@ class dbHandler {
 
         return await this.connection.execute(query, [jsonData])
     }
+    async getPlayerByID(id) {
+        const query = "CALL sp_getPlayerByID(?);"
+        const result = await this.connection.execute(query, [id])
+        return result[0][0][0]?.Player
+    }
 
+    async getUserID(token) {
+        const query = "CALL sp_getUserID(?);"
+        const result = await this.connection.execute(query, [token])
+        return result[0][0][0]?.userID
+    }
+
+    async getFunds(userID) {
+        const query = "CALL sp_getFunds(?);"
+        const result = await this.connection.execute(query, [userID])
+        return result[0][0][0]?.Funds
+    }
+
+    async getDistance(src, dst) {
+        const query = "CALL sp_getDistance(?,?);"
+        const result = await this.connection.execute(query, [src, dst])
+        return result[0][0][0]?.Distance
+    }
+
+    // Goods
     async buyGood(token: string, type: GoodType, amount: number) {
         const query = "CALL sp_buyGood(?);"
         const jsonData = JSON.stringify({
@@ -121,17 +138,7 @@ class dbHandler {
         return await this.connection.execute(query, [jsonData])
     }
 
-    async buyTown(token: string, townID: number, name: string = "unnamed") {
-        const query = "Call sp_buyTown(?);"
-        const jsonData = JSON.stringify({
-            token: token,
-            assetID: townID,
-            name: name
-        })
-        const result = await this.connection.execute(query, [jsonData])
-        return result[0][0][0]?.Town
-    }
-
+    // World
     async getWorlds() {
         const query = "CALL sp_getAllWorlds();"
         const result = await this.connection.execute(query)
@@ -150,45 +157,76 @@ class dbHandler {
         return result[0][0][0]?.Assets
     }
 
-    async getAllTowns() {
-        const query = "CALL sp_getAllTowns();"
-        const result = await this.connection.execute(query)
+    // Town
+    async getAllTowns(worldID) {
+        const query = "CALL sp_getAllTowns(?);"
+        const result = await this.connection.execute(query, [worldID])
         return result[0][0][0]?.Towns
     }
 
-    async getTownByID(assetID) {
+    async getTownByID(townID) {
         const query = "CALL sp_getTownByID(?)"
-        const result = this.connection.query(query, [assetID])
+        const result = await this.connection.execute(query, [townID])
         return result[0][0][0]?.Town
     }
 
-    async getPlayerByID(id) {
-        const query = "CALL sp_getPlayerByID(?);"
-        const result = await this.connection.execute(query, [id])
-        return result[0][0][0]?.Player
+    async buyTown(token: string, townID: number, name: string = "unnamed") {
+        const query = "Call sp_buyTown(?);"
+        const jsonData = JSON.stringify({
+            token: token,
+            assetID: townID,
+            name: name
+        })
+        const result = await this.connection.execute(query, [jsonData])
+        return result[0][0][0]?.Town
     }
 
-    async buyStation(id) {
-        const query = "CALL sp_buyStation(?);"
-        const result = await this.connection.execute(query, [id])
-        return result[0][0][0]?.Station
+    // Railway
+    async buyRailway(src, dst) {
+        const query = "CALL sp_buyRailway(?);"
+        const jsonData = JSON.stringify({
+            src: src,
+            dst: dst
+        })
+        const result = await this.connection.execute(query, [jsonData])
+        return result[0][0][0]?.Track
     }
 
-    async getAllBusiness() {
-        const query = "CALL sp_getAllBusiness();"
-        const result = await this.connection.execute(query)
+    async getAllRailways(stationID) {
+        const query = "CALL sp_getAllRailways(?);"
+        const result = await this.connection.execute(query, [stationID])
+        return result[0][0][0].Tracks
+    }
+
+    // Business
+    async getAllBusiness(worldID) {
+        const query = "CALL sp_getAllBusiness(?);"
+        const result = await this.connection.execute(query, [worldID])
         return result[0][0][0]?.Business
     }
 
-    async getAllIndustries() {
-        const query = "CALL sp_getAllIndustries()"
-        const result = await this.connection.execute(query)
+    async getBusinessByID(businessID) {
+        const query = "CALL sp_getBusinessByID(?);"
+        const result = await this.connection.execute(query, [businessID])
+        return result[0][0][0]?.Business
+    }
+
+    async buyBusiness(businessID) {
+        const query = "CALL sp_buyBusiness(?);"
+        const result = await this.connection.execute(query, [businessID])
+        return result[0][0][0]?.Business
+    }
+
+    // Industry
+    async getAllIndustries(townID) {
+        const query = "CALL sp_getAllIndustries(?)"
+        const result = await this.connection.execute(query, [townID])
         return result[0][0][0]?.Industries
     }
 
-    async getIndustryByID(id) {
+    async getIndustryByID(industryID) {
         const query = "CALL sp_getIndustryByID(?);"
-        const result = await this.connection.execute(query, [id])
+        const result = await this.connection.execute(query, [industryID])
         return result[0][0][0]?.Industry
     }
 
@@ -198,10 +236,54 @@ class dbHandler {
         return result[0][0][0]?.Industry
     }
 
-    async buyTrain(assetID) {}
-    async getTrainByID(id) {}
-    async getTrainForStation(assetID) {}
-    async getAllTrains() {}
+    // Train
+    async buyTrain(userID, stationID) {
+        const query = "CALL sp_buyTrain(?);"
+        const jsonData = JSON.stringify({
+            userID: userID,
+            stationID: stationID
+        })
+        return await this.connection.execute(query, [jsonData])
+    }
+
+    async getTrainByID(id) {
+        const query = "CALL sp_getTrainByID(?);"
+        const result = await this.connection.execute(query, [id])
+
+        return result[0][0][0]?.Train
+    }
+
+    async getAllTrains(worldID) {
+        const query = "CALL sp_getAllTrains(?);"
+        const result = await this.connection.execute(query, [worldID])
+        return result[0][0][0]?.Trains
+    }
+
+    // Station
+    async buyStation(assetID) {
+        const query = "CALL sp_buyStation(?);"
+        const result = await this.connection.execute(query, [assetID])
+        return result[0][0][0]?.Station
+    }
+
+    async getStationByID(stationID) {
+        const query = "CALL sp_getStationByID(?);"
+        const result = await this.connection.execute(query, [stationID])
+        return result[0][0][0]?.Station
+    }
+
+    async getAllStations(assetID) {
+        const query = "CALL sp_getAllStations(?);"
+        const result = await this.connection.execute(query, [assetID])
+        return result[0][0][0]?.Stations
+    }
+
+    // Wagon
+    async getWagons(userID) {
+        const query = "CALL sp_getWagons(?);"
+        const result = await this.connection.execute(query, [userID])
+        return result[0][0][0]?.Wagons
+    }
 }
 
 export default dbHandler

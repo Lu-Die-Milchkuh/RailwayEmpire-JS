@@ -6,7 +6,7 @@ DROP PROCEDURE IF EXISTS sp_getFreeWorld;
 
 CREATE PROCEDURE sp_getFreeWorld()
 BEGIN
-    SELECT w.*
+    SELECT w.worldID as World
     FROM World w
     LEFT JOIN (
         SELECT worldIDFK, COUNT(*) AS numPlayers
@@ -19,3 +19,5 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+CALL sp_getFreeWorld();

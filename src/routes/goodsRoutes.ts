@@ -30,13 +30,6 @@ import { validateToken } from "../auth/tokenAuth"
 const goodsController = new GoodsController()
 
 const goodsRoutesPlugin = new Elysia({ prefix: "/goods" })
-    // Schema of the required body
-    // .model({
-    //     Good: t.Object({
-    //         type: t.String(),
-    //         amount: t.Number()
-    //     })
-    // })
     .get("/", goodsController.getAllGoods, { beforeHandle: validateToken })
     .guard(
         {

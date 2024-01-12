@@ -28,14 +28,16 @@ import { validateToken } from "../auth/tokenAuth"
 
 const playerController = new PlayerController()
 
-const playerRoutesPlugin = new Elysia()
-    .get("/player/:id", playerController.getPlayerByID, {
+const playerRoutesPlugin = new Elysia().get(
+    "/player/:id",
+    playerController.getPlayerByID,
+    {
         beforeHandle: validateToken,
         response: {
             200: "Player",
             404: t.Object({ error: t.String() })
         }
-    })
-    .post("/player/delete", () => {}, { beforeHandle: validateToken })
+    }
+)
 
 export default playerRoutesPlugin

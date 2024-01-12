@@ -37,7 +37,7 @@ BEGIN
     INSERT INTO Railway.User (username, password, joinDate, worldIDFK)
     VALUES (v_username, v_password, CURRENT_TIMESTAMP, v_worldID);
 
-    SELECT v_username, v_password, v_worldID AS Player;
+    SELECT v_worldID AS Player;
 END $$
 
 DELIMITER ;

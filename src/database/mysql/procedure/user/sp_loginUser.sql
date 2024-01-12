@@ -20,12 +20,15 @@ BEGIN
         SET MESSAGE_TEXT = 'Invalid JSON';
     END IF;
 
-    SELECT password FROM User WHERE username = v_username;
+    SELECT JSON_OBJECT(
+        'password', password,
+           'worldIDFK', worldIDFK
+           ) as Player FROM User WHERE username = v_username;
 
 END$$
 
 DELIMITER ;
 
 -- CALL sp_loginUser('{"username": "foo", "password": "$2b$10$8pEJZpovfTKbp37wACXWw.vJkn8qlinL6rr1F54MyNf.wOTSIWlnq"}');
-CALL sp_loginUser('{"username": "foo"}');
-CALL sp_loginUser('{"username": "foo2"}');
+-- CALL sp_loginUser('{"username": "test3"}');
+ CALL sp_loginUser('{"username": "foo2"}');

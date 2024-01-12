@@ -66,7 +66,8 @@ async function generateToken(ctx) {
     const jwt = ctx.jwt
     const username = ctx.body.username
 
-    const token = await jwt.sign(username)
+    // const token = await jwt.sign(username)
+    const token = await jwt.sign({ username: username })
     await db.saveToken(username, token)
 
     return token

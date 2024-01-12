@@ -39,15 +39,15 @@ class PublicController {
             }
 
             const HASHED_PASSWORD = await Bun.password.hash(password, {
-                algorithm: "bcrypt"
+                algorithm: "argon2i"
             })
 
-            await db.register(username, HASHED_PASSWORD)
-
+            const worldID = await db.register(username, HASHED_PASSWORD)
             const token = await generateToken(ctx)
+
             return {
                 token: token,
-                worldID: world.worldID
+                worldID: worldID
             }
         } catch (error) {
             if (error.message === "Duplicate entry for username") {
@@ -72,15 +72,16 @@ class PublicController {
         const jwt = ctx.jwt
 
         try {
-            const result = await db.login(username)
-            const HASHED_PASSWORD = result[0][0][0]?.password
+            const player = await db.login(username)
 
-            if (!HASHED_PASSWORD) {
+            if (!player) {
                 ctx.set.status = 404
                 return {
                     error: "Username not found!"
                 }
             }
+
+            const HASHED_PASSWORD = player.password
 
             if (!(await Bun.password.verify(password, HASHED_PASSWORD))) {
                 ctx.set.status = 401
@@ -92,11 +93,10 @@ class PublicController {
             const token = await jwt.sign(username)
 
             await db.saveToken(username, token)
-            const world = await db.getWorldForUser(username)
 
             return {
                 token: token,
-                worldID: world.worldID
+                worldID: player.worldIDFK
             }
         } catch (error) {
             console.log(error)
@@ -134,20 +134,11 @@ class PublicController {
 
     // Return Information about a World specified by a provided ID
     async getWorldById(ctx) {
-        const id = ctx.params.id
         const db = ctx.db
-
-        const isNum = /^\d+$/.test(id)
-
-        if (!isNum) {
-            ctx.set.status = 400
-            return {
-                error: "ID has to be a Number!"
-            }
-        }
+        const worldID = ctx.params.worldID
 
         try {
-            const world = await db.getWorldById(id)
+            const world = await db.getWorldById(worldID)
 
             if (!world) {
                 ctx.set.status = 404
@@ -158,17 +149,6 @@ class PublicController {
 
             return world
         } catch (error) {
-            if (
-                error.code === "ER_SIGNAL_EXCEPTION" &&
-                error.sqlState === "45000" &&
-                error.message === "World not found"
-            ) {
-                ctx.set.status = 404
-                return {
-                    error: "A World with that ID does not exist!"
-                }
-            }
-
             console.log(error)
             ctx.set.status = 500
             return {

@@ -67,7 +67,13 @@ const publicRoutesPlugin = new Elysia()
                     404: t.Object({ error: t.String() })
                 }
             })
-            .get("/:id", publicController.getWorldById, {
+            .get("/:worldID", publicController.getWorldById, {
+                params: t.Object({ worldID: t.Numeric() }),
+                error({}) {
+                    return {
+                        error: "ID has to be a number!"
+                    }
+                },
                 response: {
                     200: "World",
                     404: t.Object({

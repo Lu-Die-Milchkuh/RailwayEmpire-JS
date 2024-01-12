@@ -29,5 +29,3 @@ export const User = t.Object(
         }
     }
 )
-
-// export { Player, User }

@@ -4,7 +4,7 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS sp_getWorldById;
 
-CREATE PROCEDURE sp_getWorldById(IN id INT)
+CREATE PROCEDURE sp_getWorldById(IN p_worldID INT)
 BEGIN
     -- Declare variables to hold world information
     DECLARE v_world_id INT;
@@ -15,12 +15,15 @@ BEGIN
     SELECT worldID, creationDate
     INTO v_world_id, v_creation_date
     FROM World
-    WHERE worldID = id;
+    WHERE worldID = p_worldID;
 
     -- Check if the world with the specified ID exists
     IF v_world_id IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'World not found';
+        -- SIGNAL SQLSTATE '45000'
+        -- SET MESSAGE_TEXT = 'World not found';
+
+        -- Error as Value > Playing throw an catch
+        SELECT NULL AS World;
     END IF;
 
     -- Select all players in the specified world as JSON array

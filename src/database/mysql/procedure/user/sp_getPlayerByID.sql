@@ -8,6 +8,7 @@ CREATE PROCEDURE sp_getPlayerByID(IN id INT)
 BEGIN
    SELECT
         JSON_OBJECT(
+            'userID',id,
             'username', username,
             'funds', funds,
             'joinDate', joinDate
