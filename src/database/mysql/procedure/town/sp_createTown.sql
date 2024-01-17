@@ -19,7 +19,7 @@ BEGIN
     UNTIL v_assetID IS NULL OR v_distance >= 50 END REPEAT;
 
     INSERT INTO Asset (name, type, population, position, level, cost, costPerDay, worldIDFK)
-    VALUES ('Unnamed', 'TOWN', 500, @point, 1, 250000, 0, p_worldID);
+    VALUES ('Unnamed Town', 'TOWN', 500, @point, 1, 250000, 0, p_worldID);
 
 END$$
 

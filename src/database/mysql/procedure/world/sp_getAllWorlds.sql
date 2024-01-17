@@ -8,6 +8,7 @@ CREATE PROCEDURE sp_getAllWorlds()
 BEGIN
 
     DECLARE v_worlds JSON;
+    DECLARE v_data JSON;
 
     -- Select world information and players for all worlds as JSON array
     SELECT JSON_ARRAYAGG(
@@ -36,11 +37,14 @@ BEGIN
                                                      )
                                              )
                                       FROM Asset))
-                   ) INTO v_worlds
+                   ) INTO v_data
                    FROM World;
 
-    -- Return the array of worlds with players
-    SELECT v_worlds as Worlds;
+     SELECT JSON_OBJECT(
+                       'code', 200,
+                       'message', null,
+                       'data', v_data
+               ) as output;
 
 END$$
 

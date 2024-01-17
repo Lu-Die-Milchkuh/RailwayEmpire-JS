@@ -4,45 +4,82 @@ DELIMITER $$
 
 DROP PROCEDURE IF EXISTS sp_buyBusiness;
 
-CREATE PROCEDURE sp_buyBusiness(in jsonData JSON)
+CREATE PROCEDURE sp_buyBusiness(in p_jsonData JSON)
+sp:
 BEGIN
     DECLARE v_funds FLOAT;
-    DECLARE v_token VARCHAR(512);
-    DECLARE v_type ENUM ('RANCH', 'FIELD', 'FARM', 'LUMBERYARD','PLANTATION','MINE');
-    DECLARE v_userID INT;
-    DECLARE v_position POINT;
     DECLARE v_cost FLOAT DEFAULT 250000;
     DECLARE v_assetID INT;
+    DECLARE v_userID INT;
+    DECLARE V_schema JSON;
 
-    SET v_position = JSON_EXTRACT(jsonData, '$.position');
-    SET v_type = JSON_EXTRACT(jsonData, '$.type');
-    SET v_token = JSON_EXTRACT(jsonData, '$.token');
+    DECLARE v_data JSON;
 
-    SELECT userIDFK INTO v_userID FROM Token WHERE token = v_token;
+    SET v_schema = '{
+      "userID": "integer",
+      "assetID": "integer"
+    }';
+
+     IF NOT JSON_VALID(p_jsonData)  OR NOT JSON_SCHEMA_VALID(v_schema, p_jsonData)  THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid JSON data';
+    END IF;
+
+    SET v_userID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.userID'));
+    SET v_assetID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.assetID'));
+
+    -- Check if the User exists
+    IF NOT EXISTS(SELECT * FROM User WHERE userID = v_userID) THEN
+        SELECT JSON_OBJECT(
+                       'code', 404,
+                       'message', 'User not found',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
+
+    -- Check if the Asset exists
+    IF NOT EXISTS(SELECT * FROM Asset WHERE assetID = v_assetID) THEN
+        SELECT JSON_OBJECT(
+                       'code', 404,
+                       'message', 'Asset not found',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
+
     SELECT funds INTO v_funds FROM user WHERE userID = v_userID;
-    SELECT assetID INTO v_assetID FROM Asset WHERE position = v_position;
+    SELECT cost INTO v_cost FROM Asset WHERE assetID = v_assetID;
 
     IF v_funds < v_cost THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Insufficient funds';
+        SELECT JSON_OBJECT(
+                       'code', 402,
+                       'message', 'Insufficient funds',
+                       'data', null
+               ) as output;
+        LEAVE sp;
     END IF;
 
-    IF v_assetID IS NOT NULL THEN
-        -- IF an Asset already exists at the position, check if its owned by someone
-        IF EXISTS (SELECT * FROM Asset WHERE position = v_position AND userIDFK IS NOT NULL) THEN
-            SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'Asset already owned';
-        ELSE
-            -- Update the existing asset to be owned by the user
-            UPDATE Asset SET userIDFK = v_userID WHERE assetID = v_assetID;
-            UPDATE User SET funds = v_funds - v_cost WHERE userID = v_userID;
-        END IF;
-    ELSE
-        -- Create a new asset
-        INSERT INTO Asset (position, type, userIDFK) VALUES (v_position, v_type, v_userID);
-        UPDATE User SET funds = v_funds - v_cost WHERE userID = v_userID;
-    END IF;
+    UPDATE User SET funds = v_funds - v_cost WHERE userID = v_userID;
+    UPDATE Asset SET userIDFK = v_userID WHERE assetID = v_assetID;
 
+    SELECT JSON_OBJECT(
+                   'assetID', assetID,
+                   'name', name,
+                   'userID', userIDFK,
+                   'type', type,
+                   'position', position,
+                   'cost', cost
+           )
+    INTO v_data
+    FROM Asset
+    WHERE assetID = v_assetID;
+
+    SELECT JSON_OBJECT(
+                   'code', 200,
+                   'message', null,
+                   'data', v_data
+           ) as output;
+    LEAVE sp;
 END$$
 
 DELIMITER ;

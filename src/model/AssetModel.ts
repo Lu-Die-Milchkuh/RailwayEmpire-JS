@@ -3,22 +3,17 @@ import { t } from "elysia"
 export const Asset = t.Object(
     {
         assetID: t.Number(),
-        type: t.Enum(
-            t.String({
-                description:
-                    "Valid Types: 'TOWN', 'RANCH', 'FIELD', 'FARM', 'LUMBERYARD','PLANTATION','MINE'"
-            })
-        ),
+        type: t.String(),
+        level: t.Number(),
         population: t.Number(),
         position: t.Object({
             x: t.Number(),
             y: t.Number()
         }),
-        level: t.Number(),
-        cost: t.Number(),
-        costPerDay: t.Number(),
+        userID: t.Optional(t.Number()),
         worldID: t.Number(),
-        userID: t.Number()
+        cost: t.Number(),
+        costPerDay: t.Number()
     },
     {
         examples: {
@@ -38,10 +33,12 @@ export const Asset = t.Object(
     }
 )
 
+export const Assets = t.Array(Asset)
+
 export const Station = t.Object(
     {
         stationID: t.Number(),
-        assetID: t.Number({
+        assetIDFK: t.Number({
             description: "The ID of the Asset where the Station was build"
         }),
         cost: t.Number(),
@@ -56,3 +53,5 @@ export const Station = t.Object(
         }
     }
 )
+
+export const Stations = t.Array(Station)

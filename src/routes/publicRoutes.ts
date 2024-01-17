@@ -43,19 +43,23 @@ const publicRoutesPlugin = new Elysia()
                 .post("/register", publicController.register, {
                     response: {
                         200: t.Object({
-                            token: t.String(),
-                            worldID: t.Number()
+                            token: t.String({ description: "An Access Token" }),
+                            worldID: t.Number({
+                                description: "The World the Player is part of"
+                            })
                         }),
-                        400: t.Object({ error: t.String() })
+                        400: "Error"
                     }
                 })
                 .post("/login", publicController.login, {
                     response: {
                         200: t.Object({
-                            token: t.String(),
-                            worldID: t.Number()
+                            token: t.String({ description: "An Access Token" }),
+                            worldID: t.Number({
+                                description: "The World the Player is part of"
+                            })
                         }),
-                        404: t.Object({ error: t.String() })
+                        404: "Error"
                     }
                 })
     )
@@ -64,7 +68,7 @@ const publicRoutesPlugin = new Elysia()
             .get("/", publicController.getWorlds, {
                 response: {
                     200: "Worlds",
-                    404: t.Object({ error: t.String() })
+                    404: "Error"
                 }
             })
             .get("/:worldID", publicController.getWorldById, {
@@ -76,9 +80,7 @@ const publicRoutesPlugin = new Elysia()
                 },
                 response: {
                     200: "World",
-                    404: t.Object({
-                        error: t.String()
-                    })
+                    404: "Error"
                 }
             })
     )

@@ -26,16 +26,29 @@
 class AssetController {
     async getAllAssets(ctx) {
         const db = ctx.db
-        const worldID = ctx.params.worldID
+        const worldID = parseInt(ctx.params.worldID)
         try {
-            const assets = await db.getAllAssets(worldID)
+            const result = await db.getAllAssets(worldID)
 
-            if (!assets) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "Either the World you selected does not exist or it has no Assets!"
+                    error: result.message
                 }
             }
+
+            const assets = result.data
+
+            // This is a shitty Hack:
+            // The Response Guard of Elysia would throw an error if the
+            // userID was Null. It is of type optional(number)
+            // which can be undefiend but not null ...
+            assets.forEach((asset) => {
+                if (!asset.userID) {
+                    asset.userID = undefined
+                }
+            })
+
             return assets
         } catch (error) {
             console.log(error)
@@ -49,40 +62,26 @@ class AssetController {
     //************** Town **************
     async buyTown(ctx) {
         const db = ctx.db
-        const { name } = ctx.body
-        const assetID = ctx.params.assetID
+        const assetID = parseInt(ctx.params.assetID)
         const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
-            const owner = await db.isAssetFree(assetID)
+            const user = await db.getUser(token)
+            const name = ctx.body.name
+            const result = await db.buyTown(
+                parseInt(user.userID),
+                assetID,
+                name
+            )
 
-            if (typeof owner === "undefined") {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "An Asset with that ID does not exist"
+                    error: result.message
                 }
             }
 
-            if (owner) {
-                ctx.set.status = 400
-                return {
-                    error: "The Asset already belongs to a User!"
-                }
-            }
-
-            const cost = await db.getAssetCost(assetID)
-            const funds = await db.getUserFunds(token)
-
-            if (funds < cost) {
-                ctx.set.status = 400
-                return {
-                    error: "Not enough funds!"
-                }
-            }
-
-            const town = await db.buyTown(token, assetID, name)
-
-            return town
+            return result.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -94,17 +93,22 @@ class AssetController {
 
     async getTownByID(ctx) {
         const db = ctx.db
-        const assetID = ctx.params.assetID
+        const assetID = parseInt(ctx.params.assetID)
 
         try {
-            const town = await db.getTownByID(assetID)
+            const result = await db.getTownByID(assetID)
 
-            if (!town) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "No Town exists with that ID"
+                    error: result.message
                 }
             }
+
+            let town = result.data
+
+            // Workaround
+            if (!town.userID) town.userID = undefined
 
             return town
         } catch (error) {
@@ -118,17 +122,24 @@ class AssetController {
 
     async getAllTowns(ctx) {
         const db = ctx.db
-        const worldID = ctx.params.worldID
+        const worldID = parseInt(ctx.params.worldID)
 
         try {
-            const towns = await db.getAllTowns(worldID)
+            const result = await db.getAllTowns(worldID)
 
-            if (!towns) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "No Towns found in this World!"
+                    error: result.message
                 }
             }
+
+            const towns = result.data
+
+            // Workaround for Null values
+            towns.forEach((town) => {
+                if (!town.userID) town.userID = undefined
+            })
 
             return towns
         } catch (error) {
@@ -140,48 +151,24 @@ class AssetController {
         }
     }
 
-    // async getAllTowns(ctx) {
-    //     const db = ctx.db
-
-    //     try {
-    //         const towns = await db.getAllTowns()
-
-    //         if (!towns) {
-    //             ctx.set.status = 404
-    //             return {
-    //                 error: "No Towns found!"
-    //             }
-    //         }
-
-    //         return towns
-    //     } catch (error) {
-    //         console.log(error)
-    //         ctx.set.status = 500
-    //         return {
-    //             error: "Internal Server error! Please try again later"
-    //         }
-    //     }
-    // }
-
     //************** Station **************
     async buyStation(ctx) {
         const db = ctx.db
-        const assetID = ctx.body.assetID
+        const assetID = parseInt(ctx.params.assetID)
+        const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
-            // const token = ctx.headers["authorization"].replace("Bearer ", "")
-            // const userID = await db.getUserID(token)
+            const user = await db.getUser(token)
+            const output = await db.buyStation(user.userID, assetID)
 
-            const station = await db.buyStation(assetID)
-
-            if (!station) {
-                ctx.set.status = 400
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "Failed to buy Station!"
+                    error: output.message
                 }
             }
 
-            return station
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -191,51 +178,26 @@ class AssetController {
         }
     }
 
-    // Get Stations that belong to a specified Asset
-    async getStationForAsset(ctx) {
+    // Get Stations
+    async getStation(ctx) {
         const db = ctx.db
-        const assetID = ctx.query.assetID
+        const assetID = parseInt(ctx.params.assetID)
 
         try {
-            const station = await db.getStationForAsset(assetID)
+            const output = await db.getStation(assetID)
 
-            if (!station) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "Either there is no Asset with that ID or ir has no Stations!"
+                    error: output.message
                 }
             }
+            console.log(output)
 
-            return station
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
-            return {
-                error: "Internal Server error! Please try again later"
-            }
-        }
-    }
-
-    // Get all Stations
-    async getAllStations(ctx) {
-        const db = ctx.db
-        const assetID = ctx.params.assetID
-
-        try {
-            const stations = await db.getAllStations(assetID)
-
-            if (!stations) {
-                ctx.set.status = 404
-                return {
-                    error: "No Stations found!"
-                }
-            }
-
-            return stations
-        } catch (error) {
-            console.log(error)
-            ctx.set.status = 500
-
             return {
                 error: "Internal Server error! Please try again later"
             }
@@ -244,19 +206,19 @@ class AssetController {
 
     async getStationByID(ctx) {
         const db = ctx.db
-        const stationID = ctx.params.stationID
+        const stationID = parseInt(ctx.params.stationID)
 
         try {
-            const station = await db.getStationByID(stationID)
+            const output = await db.getStationByID(stationID)
 
-            if (!station) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "A Station with that ID does not exist"
+                    error: output.message
                 }
             }
 
-            return station
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -274,33 +236,17 @@ class AssetController {
 
         try {
             const token = ctx.headers["authorization"].replace("Bearer ", "")
-            const userID = await db.getUserID(token)
-            const station = await db.getStationByID(stationID)
+            const user = await db.getUser(token)
 
-            if (!station) {
-                ctx.set.status = 404
+            const result = await db.buyTrain(user.userID, stationID)
+
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "A Station with this ID does not exist"
+                    error: result.message
                 }
             }
-
-            if (userID != station.userID) {
-                ctx.set.status = 401
-                return {
-                    error: "Looks like you are not the owner of this station!"
-                }
-            }
-
-            const funds = await db.getFunds(userID)
-
-            if (funds < station.cost) {
-                ctx.set.status = 401
-                return {
-                    error: "Not enough funds!"
-                }
-            }
-
-            await db.buyTrain(userID, stationID)
+            // Status 200 by Default so no need to send anything
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -312,18 +258,18 @@ class AssetController {
 
     async getAllTrains(ctx) {
         const db = ctx.db
-        const stationID = ctx.params.stationID
+        const stationID = parseInt(ctx.params.stationID)
         try {
-            const trains = await db.getAllTrains(stationID)
+            const output = await db.getAllTrains(stationID)
 
-            if (!trains) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "No Trains found+"
+                    error: output.message
                 }
             }
 
-            return trains
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -335,20 +281,19 @@ class AssetController {
 
     async getTrainByID(ctx) {
         const db = ctx.db
-        const id = ctx.params.id
+        const trainID = parseInt(ctx.params.trainID)
 
         try {
-            const result = await db.getTrainByID(id)
-            const train = result[0][0][0]?.Train
+            const output = await db.getTrainByID(trainID)
 
-            if (!train) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "A Train with that ID does not exist"
+                    error: output.message
                 }
             }
 
-            return train
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -363,25 +308,14 @@ class AssetController {
         const { trainID, stationID } = ctx.body
 
         try {
-            const station = await db.getStationByID(stationID)
+            const output = await db.createRoute(trainID, stationID)
 
-            if (!station) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "A Station with this ID does not exist"
+                    error: output.message
                 }
             }
-
-            const route = await db.getRoute(trainID)
-
-            if (route) {
-                ctx.set.status = 401
-                return {
-                    error: "The Train is already on a Route! Wait until it has returned!"
-                }
-            }
-
-            await db.createRoute(trainID, stationID)
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -394,7 +328,7 @@ class AssetController {
     //************** Industry **************
     async buyIndustry(ctx) {
         const db = ctx.db
-        const assetID = ctx.params.assetID
+        const assetID = parseInt(ctx.params.assetID)
         const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
@@ -407,7 +341,9 @@ class AssetController {
                 }
             }
 
-            const industry = await db.buyIndustry(token, assetID)
+            const { type } = ctx.body
+
+            const industry = await db.buyIndustry(token, assetID, type)
 
             if (!industry) {
                 ctx.set.status = 401
@@ -429,19 +365,19 @@ class AssetController {
     // Returns all Industries the User owns
     async getAllIndustries(ctx) {
         const db = ctx.db
-        const assetID = ctx.params.assetID
+        const assetID = parseInt(ctx.params.assetID)
 
         try {
-            const industries = await db.getAllIndustries(assetID)
+            const output = await db.getAllIndustries(assetID)
 
-            if (!industries) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "No Industries found!"
+                    error: output.message
                 }
             }
 
-            return industries
+            return output.message
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -453,19 +389,19 @@ class AssetController {
 
     async getIndustryByID(ctx) {
         const db = ctx.db
-        const industryID = ctx.params.industryID
+        const industryID = parseInt(ctx.params.industryID)
 
         try {
-            const industry = await db.getIndustryByID(industryID)
+            const output = await db.getIndustryByID(industryID)
 
-            if (!industry) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "A Industry with that ID does not exist!"
+                    error: output.message
                 }
             }
 
-            return industry
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -479,32 +415,26 @@ class AssetController {
 
     async buyRailway(ctx) {
         const db = ctx.db
-        const stationID = ctx.params.stationID
-        const destStationID = ctx.params.destStationID
+        const stationID = parseInt(ctx.params.stationID)
+        const destStationID = parseInt(ctx.params.destStationID)
 
         try {
             const token = ctx.headers["authorization"].replace("Bearer ", "")
-            const userID = await db.getUserID(token)
-            const funds = await db.getFunds(userID)
-            const distance = await db.getDistance(stationID, destStationID)
+            const user = await db.getUser(token)
 
-            if (funds < distance) {
-                ctx.set.status = 401
+            const output = await db.buyRailway(
+                user.userID,
+                stationID,
+                destStationID
+            )
+
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "Not enough funds!"
+                    error: output.message
                 }
             }
-
-            const track = await db.buyRailway(userID, stationID, destStationID)
-
-            if (!track) {
-                ctx.set.status = 401
-                return {
-                    error: "Failed to build Railway! Either Source or Destination Station does not exist"
-                }
-            }
-
-            return track
+            // Status 200 as Default
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -516,43 +446,18 @@ class AssetController {
 
     async getAllRailways(ctx) {
         const db = ctx.db
-        const stationID = ctx.params.stationID
+        const stationID = parseInt(ctx.params.stationID)
 
         try {
-            const tracks = await db.getAllRailways(stationID)
+            const output = await db.getAllRailways(stationID)
 
-            if (!tracks) {
-                ctx.set.status = 404
+            if (output.code != 200) {
                 return {
-                    error: "No Railways found!"
+                    error: output.message
                 }
             }
 
-            return tracks
-        } catch (error) {
-            console.log(error)
-            ctx.set.status = 500
-            return {
-                error: "Internal Server error! Please try again later"
-            }
-        }
-    }
-
-    async getRailwayForStation(ctx) {
-        const db = ctx.db
-        const id = ctx.params.stationID
-
-        try {
-            const track = await db.getRailwayForStation(id)
-
-            if (!track) {
-                ctx.set.status = 404
-                return {
-                    error: "A Railway with that ID does not exist"
-                }
-            }
-
-            return track
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -565,19 +470,18 @@ class AssetController {
     //************** Business **************
     async getAllBusiness(ctx) {
         const db = ctx.db
-        const worldID = ctx.params.worldID
+        const worldID = parseInt(ctx.params.worldID)
 
         try {
-            const business = await db.getAllBusiness(worldID)
+            const output = await db.getAllBusiness(worldID)
 
-            if (!business) {
-                ctx.set.satus = 404
+            if (output.code != 200) {
                 return {
-                    error: "No Business found!"
+                    error: output.message
                 }
             }
 
-            return business
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -589,19 +493,19 @@ class AssetController {
 
     async getBusinessByID(ctx) {
         const db = ctx.db
-        const assetID = ctx.params.assetID
+        const assetID = parseInt(ctx.params.assetID)
 
         try {
-            const business = await db.getBusinessByID(assetID)
+            const output = await db.getBusinessByID(assetID)
 
-            if (!business) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "A Businesss with that ID does not exist"
+                    error: output.message
                 }
             }
 
-            return business
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -613,19 +517,21 @@ class AssetController {
 
     async buyBusiness(ctx) {
         const db = ctx.db
-        const assetID = ctx.params.assetID
+        const assetID = parseInt(ctx.params.assetID)
+        const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
-            const business = await db.buyBusiness(assetID)
+            const user = await db.getUser(token)
+            const output = await db.buyBusiness(user.userID, assetID)
 
-            if (!business) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "Failed to buy Business!"
+                    error: output.message
                 }
             }
 
-            return business
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
@@ -639,17 +545,17 @@ class AssetController {
         const db = ctx.db
         try {
             const token = ctx.headers["authorization"].replace("Bearer ", "")
-            const userID = await db.getUserID(token)
-            const wagons = await db.getWagons(userID)
+            const user = await db.getUser(token)
+            const output = await db.getWagons(user.userID)
 
-            if (!wagons) {
-                ctx.set.status = 404
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "Looks like you dont have any wagons!"
+                    error: output.message
                 }
             }
 
-            return wagons
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500

@@ -35,38 +35,58 @@ const assetController = new AssetController()
 const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
 
     .get("/", assetController.getAllAssets, {
-        beforeHandle: validateToken
+        beforeHandle: validateToken,
+        response: {
+            200: "Assets",
+            404: "Error"
+        }
     })
 
     .group("/town", { beforeHandle: validateToken }, (plugin) =>
         plugin
-            .get("/", assetController.getAllTowns)
+            .get("/", assetController.getAllTowns, {
+                response: {
+                    200: "Towns",
+                    404: "Error"
+                }
+            })
             .group(":assetID", (plugin) =>
                 plugin
-                    .get("/", assetController.getTownByID)
+                    .get("/", assetController.getTownByID, {
+                        response: {
+                            200: "Asset",
+                            404: "Error"
+                        }
+                    })
                     .post("/", assetController.buyTown, {
-                        body: t.Optional(
-                            t.Object({
-                                name: t.String({
-                                    description: "Optional Name for your Town"
-                                })
-                            })
-                        ),
+                        body: t.Object({
+                            name: t.String()
+                        }),
+                        error({}) {
+                            return {
+                                error: "Expected a Name!"
+                            }
+                        },
                         response: {
                             200: "Town",
-                            404: t.Object({ error: t.String() })
+                            404: "Error"
                         }
                     })
                     .group("/industry", (plugin) =>
                         plugin
-                            .get("/", assetController.getAllIndustries)
+                            .get("/", assetController.getAllIndustries, {
+                                response: {
+                                    200: "Town",
+                                    404: "Error"
+                                }
+                            })
                             .get(
                                 ":industryID",
                                 assetController.getIndustryByID,
                                 {
                                     response: {
                                         200: "Industry",
-                                        404: t.Object({ error: t.String() })
+                                        404: "Error"
                                     }
                                 }
                             )
@@ -74,12 +94,27 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                     )
                     .group("station", (plugin) =>
                         plugin
-                            .get("/", assetController.getAllStations)
+                            .get("/", assetController.getStation, {
+                                response: {
+                                    200: "Station",
+                                    404: "Error"
+                                }
+                            })
                             .post("/", assetController.buyStation)
-                            .get(":stationID", assetController.getStationByID)
+                            .get(":stationID", assetController.getStationByID, {
+                                response: {
+                                    200: "Station",
+                                    404: "Error"
+                                }
+                            })
                             .group(":stationID/railway", (plugin) =>
                                 plugin
-                                    .get("/", assetController.getAllRailways)
+                                    .get("/", assetController.getAllRailways, {
+                                        response: {
+                                            200: "Railways",
+                                            404: "Error"
+                                        }
+                                    })
                                     .post(
                                         "/:destStationID",
                                         assetController.buyRailway
@@ -122,7 +157,7 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                     .post("/", assetController.buyBusiness)
                     .group("/station", (plugin) =>
                         plugin
-                            .get("/", assetController.getAllStations)
+                            .get("/", assetController.getStation)
                             .get("/:stationID", assetController.getStationByID)
                             .post("/", assetController.buyStation)
                             .group(":stationID/railway", (plugin) =>

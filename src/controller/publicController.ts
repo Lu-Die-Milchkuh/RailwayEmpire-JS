@@ -32,17 +32,20 @@ class PublicController {
         const password = ctx.body.password
 
         try {
-            const world = await db.getFreeWorld()
-
-            if (!world) {
-                await db.createNewWorld()
-            }
-
             const HASHED_PASSWORD = await Bun.password.hash(password, {
                 algorithm: "argon2i"
             })
 
-            const worldID = await db.register(username, HASHED_PASSWORD)
+            const result = await db.register(username, HASHED_PASSWORD)
+
+            if (result.code != 200) {
+                ctx.set.status = result.code
+                return {
+                    error: result.message
+                }
+            }
+
+            const worldID = result.data.worldID
             const token = await generateToken(ctx)
 
             return {
@@ -50,13 +53,6 @@ class PublicController {
                 worldID: worldID
             }
         } catch (error) {
-            if (error.message === "Duplicate entry for username") {
-                ctx.set.status = 400
-                return {
-                    error: "Username already taken!"
-                }
-            }
-
             console.log(error)
             ctx.set.status = 500
             return {
@@ -72,14 +68,16 @@ class PublicController {
         const jwt = ctx.jwt
 
         try {
-            const player = await db.login(username)
+            const result = await db.login(username)
 
-            if (!player) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "Username not found!"
+                    error: result.message
                 }
             }
+
+            const player = result.data
 
             const HASHED_PASSWORD = player.password
 
@@ -112,19 +110,18 @@ class PublicController {
         const db = ctx.db
 
         try {
-            const worlds = await db.getWorlds()
+            const result = await db.getWorlds()
 
-            if (!worlds) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "You found a Glitch in the Matrix! There are no Worlds found!"
+                    error: result.message
                 }
             }
 
-            return worlds
+            return result.data
         } catch (error) {
             console.log(error)
-
             ctx.set.status = 500
             return {
                 error: "Internal Server error! Please try again later."
@@ -135,19 +132,19 @@ class PublicController {
     // Return Information about a World specified by a provided ID
     async getWorldById(ctx) {
         const db = ctx.db
-        const worldID = ctx.params.worldID
+        const worldID = parseInt(ctx.params.worldID)
 
         try {
-            const world = await db.getWorldById(worldID)
+            const result = await db.getWorldById(worldID)
 
-            if (!world) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "A World with that ID does not exist!"
+                    error: result.message
                 }
             }
 
-            return world
+            return result.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
