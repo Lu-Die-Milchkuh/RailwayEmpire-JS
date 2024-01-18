@@ -66,7 +66,7 @@ END$$
 
 DELIMITER ;
 
-CALL sp_getWorldById('{"worldID": 61}');
+CALL sp_getWorldById('{"worldID": 63}');
 
 
 

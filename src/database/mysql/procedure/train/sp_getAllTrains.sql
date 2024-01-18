@@ -22,6 +22,11 @@ sp:BEGIN
 
     SET v_stationID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.stationID'));
 
+    IF v_stationID IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'stationID is null';
+    END IF;
+
     -- Check if the Station exists
     IF NOT EXISTS(SELECT * FROM Station WHERE stationID = v_stationID) THEN
         SELECT JSON_OBJECT(

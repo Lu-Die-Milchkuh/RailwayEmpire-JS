@@ -51,4 +51,3 @@ END$$
 
 DELIMITER ;
 
-CALL sp_createBusiness(10);

@@ -25,20 +25,28 @@ BEGIN
       "type": "string"
     }';
 
-    IF NOT (JSON_VALID(jsonData)) OR NOT JSON_SCHEMA_VALID(v_schema, jsonData) THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'JSON is not valid';
-    END IF;
-
+    -- IF NOT JSON_VALID(jsonData) OR NOT JSON_SCHEMA_VALID(v_schema, jsonData) THEN
+    --    SIGNAL SQLSTATE '45000'
+    --        SET MESSAGE_TEXT = 'JSON is not valid';
+    -- END IF;
 
     SET v_townID = JSON_UNQUOTE(JSON_EXTRACT(jsonData, '$.assetID'));
     SET v_industryType = JSON_UNQUOTE(JSON_EXTRACT(jsonData, '$.type'));
     SET v_userID = JSON_UNQUOTE(JSON_EXTRACT(jsonData, '$.userID'));
 
+    IF v_townID IS NULL OR v_industryType IS NULL OR v_userID IS NULL THEN
+        SELECT JSON_OBJECT(
+                       'code', 400,
+                       'message', 'Missing parameters',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
+
     -- TODO: Check how many Industries the Town can have
 
     SELECT funds INTO v_funds FROM User WHERE userID = v_userID;
-    SELECT cost INTO v_industryCost FROM Industry WHERE assetIDFK = v_townID;
+    SELECT cost INTO v_industryCost FROM Industry WHERE assetIDFK = v_townID LIMIT 1;
 
     IF ((v_funds - v_industryCost) < 0) THEN
         SELECT JSON_OBJECT(
@@ -51,7 +59,7 @@ BEGIN
 
     UPDATE User SET funds = v_funds - v_industryCost WHERE userID = v_userID;
 
-    INSERT INTO Industry (assetIDFK) VALUES (v_townID);
+    INSERT INTO Industry(assetIDFK,type) VALUES (v_townID,v_industryType);
 
     SELECT JSON_OBJECT(
                    'code', 200,
@@ -61,3 +69,6 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- CALL sp_buyIndustry('{"userID":101,"assetID":2227,"type":"BUTCHER"}');
+

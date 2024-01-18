@@ -16,11 +16,15 @@ BEGIN
       "stationID": "integer"
     }';
 
-    IF JSON_VALID(p_jsonData) = 0 OR JSON_SCHEMA_VALID(v_schema, p_jsonData) = 0 THEN
+    IF NOT JSON_VALID(p_jsonData) OR NOT JSON_SCHEMA_VALID(v_schema, p_jsonData)  THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid JSON data';
     END IF;
 
     SET v_stationID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.stationID'));
+
+    IF v_stationID IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'stationID cannot be null';
+    END IF;
 
     SELECT Station.stationID INTO temp_stationID FROM Station WHERE Station.stationID = v_stationID;
 

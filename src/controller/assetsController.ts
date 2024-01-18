@@ -305,10 +305,18 @@ class AssetController {
 
     async sendTrain(ctx) {
         const db = ctx.db
-        const { trainID, stationID } = ctx.body
+        const destinationStationID = ctx.params.destinationStationID
+        const trainID = ctx.params.trainID
+        const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
-            const output = await db.createRoute(trainID, stationID)
+            const user = await db.getUser(token)
+
+            const output = await db.createRoute(
+                user.userID,
+                trainID,
+                destinationStationID
+            )
 
             if (output.code != 200) {
                 ctx.set.status = output.code
@@ -332,27 +340,16 @@ class AssetController {
         const token = ctx.headers["authorization"].replace("Bearer ", "")
 
         try {
-            const isOwner = await db.isOwner(token, assetID)
-
-            if (!isOwner) {
-                ctx.set.status = 401
-                return {
-                    error: "You are not the Owner of this Town!"
-                }
-            }
-
             const { type } = ctx.body
+            const user = await db.getUser(token)
+            const output = await db.buyIndustry(user.userID, assetID, type)
 
-            const industry = await db.buyIndustry(token, assetID, type)
-
-            if (!industry) {
-                ctx.set.status = 401
+            if (output.code != 200) {
+                ctx.set.status = output.code
                 return {
-                    error: "Failed to buy Industry"
+                    error: output.message
                 }
             }
-
-            return industry
         } catch (error) {
             console.log(error)
             ctx.set.status = 500

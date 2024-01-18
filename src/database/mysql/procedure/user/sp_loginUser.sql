@@ -48,9 +48,3 @@ sp:BEGIN
 END$$
 
 DELIMITER ;
-
--- CALL sp_loginUser('{"username": "foo", "password": "$2b$10$8pEJZpovfTKbp37wACXWw.vJkn8qlinL6rr1F54MyNf.wOTSIWlnq"}');
--- CALL sp_loginUser('{"username": "test3"}');
-CALL sp_loginUser('{
-  "username": "foo2"
-}');

@@ -13,7 +13,6 @@ BEGIN
     DECLARE v_funds FLOAT;
     DECLARE v_name VARCHAR(255);
     DECLARE v_schema JSON;
-    DECLARE tmp_userID INT;
     DECLARE v_data JSON;
 
     SET v_schema = '{
@@ -30,12 +29,14 @@ BEGIN
     SET v_townID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.assetID'));
     SET v_name = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.name'));
 
-    SELECT userIDFK INTO tmp_userID FROM Asset WHERE assetID = v_townID;
+    IF v_userID IS NULL OR v_townID IS NULL OR v_name IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Missing data';
+    END IF;
 
-    IF tmp_userID IS NOT NULL THEN
+    IF NOT EXISTS(SELECT * FROM User WHERE userID = v_userID) THEN
         SELECT JSON_OBJECT(
-                       'code', 401,
-                       'message', 'Town already owned',
+                       'code', 404,
+                       'message', 'User not found',
                        'data', null
                ) as output;
         LEAVE sp;
@@ -48,6 +49,24 @@ BEGIN
         SELECT JSON_OBJECT(
                        'code', 402,
                        'message', 'Insufficient funds',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
+
+    IF NOT EXISTS(SELECT * FROM Asset WHERE assetID = v_townID AND type = 'TOWN') THEN
+        SELECT JSON_OBJECT(
+                       'code', 404,
+                       'message', 'Town not found',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
+
+    IF (SELECT userIDFK FROM Asset WHERE assetID = v_townID) IS NOT NULL THEN
+        SELECT JSON_OBJECT(
+                       'code', 401,
+                       'message', 'Town already owned ',
                        'data', null
                ) as output;
         LEAVE sp;

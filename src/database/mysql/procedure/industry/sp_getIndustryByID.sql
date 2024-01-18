@@ -5,7 +5,8 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_getIndustryByID;
 
 CREATE PROCEDURE sp_getIndustryByID(IN p_jsonData JSON)
-sp:BEGIN
+sp:
+BEGIN
     DECLARE v_schema JSON;
     DECLARE v_industryID INT;
     DECLARE v_data JSON;
@@ -14,34 +15,42 @@ sp:BEGIN
       "industryID": "integer"
     }';
 
-    IF NOT JSON_VALID(p_jsonData)  OR NOT JSON_SCHEMA_VALID(v_schema, p_jsonData) THEN
+    IF NOT JSON_VALID(p_jsonData) OR NOT JSON_SCHEMA_VALID(v_schema, p_jsonData) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid JSON data';
     END IF;
 
     SET v_industryID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.industryID'));
 
+    IF v_industryID IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'industryID cannot be empty';
+    END IF;
+
     -- Check if Industry exists
-    IF NOT EXISTS(SELECT industryID FROM Industry WHERE industryID = v_industryID) THEN
+    IF NOT EXISTS(SELECT * FROM Industry WHERE industryID = v_industryID) THEN
         SELECT JSON_OBJECT(
-                'code', 404,
-                'message', 'Industry not found',
-                'data', null
-        ) as output;
+                       'code', 404,
+                       'message', 'Industry not found',
+                       'data', null
+               ) as output;
         LEAVE sp;
     END IF;
 
     SELECT JSON_OBJECT(
                    'industryID', industryID,
-                   'type', type
-           ) INTO v_data
+                   'type', type,
+                   'assetIDFK', assetIDFK,
+                   'cost', cost,
+                   'costPerDay', costPerDay
+           )
+    INTO v_data
     FROM Industry
     WHERE industryID = v_industryID;
 
     SELECT JSON_OBJECT(
-            'code', 200,
-            'message', null,
-            'data', v_data
-    ) as output;
+                   'code', 200,
+                   'message', null,
+                   'data', v_data
+           ) as output;
 END$$
 
 DELIMITER $$

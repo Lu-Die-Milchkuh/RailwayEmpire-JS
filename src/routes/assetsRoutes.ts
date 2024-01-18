@@ -90,7 +90,16 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                                     }
                                 }
                             )
-                            .post("/", assetController.buyIndustry)
+                            .post("/", assetController.buyIndustry, {
+                                body: t.Object({
+                                    type: t.String()
+                                }),
+                                error({}) {
+                                    return {
+                                        error: "Expected a Industry Type"
+                                    }
+                                }
+                            })
                     )
                     .group("station", (plugin) =>
                         plugin
@@ -129,16 +138,8 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                                     )
                                     .post("/", assetController.buyTrain)
                                     .post(
-                                        ":trainID/send",
-                                        assetController.sendTrain,
-                                        {
-                                            body: t.Object({
-                                                stationID: t.Number({
-                                                    description:
-                                                        "The ID of the DESTINATION Station"
-                                                })
-                                            })
-                                        }
+                                        ":trainID/send/:destinationStationID",
+                                        assetController.sendTrain
                                     )
                                     .get(
                                         ":trainID/wagon",
