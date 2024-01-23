@@ -27,7 +27,7 @@ async function validateToken(ctx) {
     const jwt = ctx.jwt
     let token = ctx.headers["authorization"]
 
-    console.log("Token: " + token)
+    // console.log("Token: " + token)
 
     if (!token) {
         ctx.set.status = 401
@@ -51,7 +51,7 @@ async function validateToken(ctx) {
             }
         }
 
-        console.log(profile)
+        // console.log(profile)
     } catch (err) {
         console.log(err)
         ctx.set.status = 500

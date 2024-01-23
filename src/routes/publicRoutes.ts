@@ -43,6 +43,7 @@ const publicRoutesPlugin = new Elysia()
                 .post("/register", publicController.register, {
                     response: {
                         200: t.Object({
+                            userID: t.Number(),
                             token: t.String({ description: "An Access Token" }),
                             worldID: t.Number({
                                 description: "The World the Player is part of"
@@ -54,6 +55,7 @@ const publicRoutesPlugin = new Elysia()
                 .post("/login", publicController.login, {
                     response: {
                         200: t.Object({
+                            userID: t.Number(),
                             token: t.String({ description: "An Access Token" }),
                             worldID: t.Number({
                                 description: "The World the Player is part of"

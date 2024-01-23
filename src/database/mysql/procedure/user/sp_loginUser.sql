@@ -32,8 +32,9 @@ sp:BEGIN
     END IF;
 
     SELECT JSON_OBJECT(
-                   'password', password,
-                   'worldIDFK', worldIDFK
+                    'userID', userID,
+                    'password', password,
+                    'worldIDFK', worldIDFK
            )
     INTO v_data
     FROM User

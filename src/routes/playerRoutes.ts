@@ -29,8 +29,8 @@ import { validateToken } from "../auth/tokenAuth"
 const playerController = new PlayerController()
 
 const playerRoutesPlugin = new Elysia().get(
-    "/player/:id",
-    playerController.getPlayerByID,
+    "/player/:userID",
+    playerController.getProfile,
     {
         beforeHandle: validateToken,
         response: {

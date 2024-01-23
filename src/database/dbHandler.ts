@@ -75,13 +75,13 @@ class dbHandler {
         return await this.connection.execute(query, [jsonData])
     }
 
-    async getPlayerByID(id) {
-        const query = "CALL sp_getPlayerByID(?);"
+    async getProfile(userID) {
+        const query = "CALL sp_getProfile(?);"
         const jsonData = {
-            userID: id
+            userID: userID
         }
         const result = await this.connection.execute(query, [jsonData])
-        return result[0][0][0]
+        return result[0][0][0].output
     }
 
     async getUser(token) {
@@ -129,7 +129,6 @@ class dbHandler {
             worldID: worldID
         }
         const result = await this.connection.execute(query, [jsonData])
-        console.log(result[0][0][0])
         return result[0][0][0].output
     }
 

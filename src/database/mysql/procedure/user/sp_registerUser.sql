@@ -52,7 +52,8 @@ BEGIN
     VALUES (v_username, v_password, CURRENT_TIMESTAMP, v_worldID);
 
     SELECT JSON_OBJECT(
-                   'worldID', v_worldID
+                   'worldID', v_worldID,
+                'userID', LAST_INSERT_ID()
            )
     INTO v_data;
 

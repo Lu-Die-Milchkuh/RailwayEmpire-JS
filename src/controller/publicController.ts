@@ -45,12 +45,14 @@ class PublicController {
                 }
             }
 
-            const worldID = result.data.worldID
+            const player = result.data
+
             const token = await generateToken(ctx)
 
             return {
+                userID: player.userID,
                 token: token,
-                worldID: worldID
+                worldID: player.worldID
             }
         } catch (error) {
             console.log(error)
@@ -93,6 +95,7 @@ class PublicController {
             await db.saveToken(username, token)
 
             return {
+                userID: player.userID,
                 token: token,
                 worldID: player.worldIDFK
             }

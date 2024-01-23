@@ -24,21 +24,21 @@
  */
 
 class PlayerController {
-    async getPlayerByID(ctx) {
+    async getProfile(ctx) {
         const db = ctx.db
-        const id = ctx.params.id
+        const userID = ctx.params.userID
 
         try {
-            const player = await db.getPlayerByID(id)
+            const result = await db.getProfile(userID)
 
-            if (!player) {
-                ctx.set.status = 404
+            if (result.code != 200) {
+                ctx.set.status = result.code
                 return {
-                    error: "A Player with that ID does not exist"
+                    error: result.message
                 }
             }
 
-            return player
+            return result.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
