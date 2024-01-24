@@ -63,6 +63,14 @@ app.use(playerRoutesPlugin)
 // an Object to the "context" Object of the Elysia instance
 app.decorate("db", db)
 
+// Default Handler (e.g unavailable ressources)
+app.all("/*", ({ set }) => {
+    set.status = 404
+    return {
+        error: "Route not populated"
+    }
+})
+
 app.listen(PORT, () => {
     console.log(`Server is up and listening on Port: ${PORT}`)
 })
