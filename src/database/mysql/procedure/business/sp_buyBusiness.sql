@@ -47,7 +47,16 @@ BEGIN
         LEAVE sp;
     END IF;
 
-    SELECT funds INTO v_funds FROM user WHERE userID = v_userID;
+    IF (SELECT userIDFK FROM Asset WHERE assetID = v_assetID) IS NOT NULL THEN
+        SELECT JSON_OBJECT(
+                       'code', 401,
+                       'message', 'Asset already owned',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
+
+    SELECT funds INTO v_funds FROM User WHERE userID = v_userID;
     SELECT cost INTO v_cost FROM Asset WHERE assetID = v_assetID;
 
     IF v_funds < v_cost THEN

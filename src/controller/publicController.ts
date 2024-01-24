@@ -108,7 +108,7 @@ class PublicController {
         }
     }
 
-    // Return an array of all World containing the ID,CreationDate and the number of Players
+    // Return an array of all Worlds containing the ID,CreationDate and the number of Players
     async getWorlds(ctx) {
         const db = ctx.db
 
