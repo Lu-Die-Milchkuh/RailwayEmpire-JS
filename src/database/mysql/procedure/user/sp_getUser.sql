@@ -25,7 +25,7 @@ sp:BEGIN
         LEAVE sp;
     END IF;
 
-    SELECT userIDFK INTO v_userIDFK FROM Token WHERE token = v_token;
+    SELECT userIDFK INTO v_userIDFK FROM Token WHERE token = v_token LIMIT 1;
 
     SELECT JSON_OBJECT('found',true,'userID', userID, 'username', username) as output FROM User WHERE userID = v_userIDFK;
 END//
