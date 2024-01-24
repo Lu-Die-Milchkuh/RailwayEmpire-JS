@@ -32,8 +32,20 @@ BEGIN
         LEAVE sp;
     END IF;
 
-    SELECT JSON_ARRAYAGG(JSON_OBJECT('assetID', assetID, 'name', name, 'owner', userIDFK, 'level', level, 'worldID',
-                                     worldIDFK))
+    SELECT JSON_ARRAYAGG(JSON_OBJECT('assetID', assetID,
+                       'type', type,
+                       'name', name,
+                       'population', population,
+                       'position', JSON_OBJECT(
+                               'x', ST_X(position),
+                               'y', ST_Y(position)
+                                   ),
+                       'level', level,
+                       'cost', cost,
+                       'costPerDay', costPerDay,
+                       'worldID', worldIDFK,
+                       'userID', userIDFK
+           ))
     INTO v_data
     FROM Asset
     WHERE type != 'TOWN'

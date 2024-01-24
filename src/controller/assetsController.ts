@@ -478,6 +478,14 @@ class AssetController {
                 }
             }
 
+            let businesses = output.data
+
+            businesses.forEach((business) => {
+                if (!business.userID) {
+                    business.userID = undefined
+                }
+            })
+
             return output.data
         } catch (error) {
             console.log(error)

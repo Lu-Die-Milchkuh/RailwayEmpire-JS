@@ -1,10 +1,10 @@
-import Elysia from "elysia"
+import { t, Elysia } from "elysia"
 import { User, Player } from "./PlayerModel"
 import { World, Worlds } from "./WorldModel"
 import { Industry } from "./IndustryModel"
 import { Good } from "./GoodModel"
 import { Asset, Assets, Station, Stations } from "./AssetModel"
-import { Train, Wagon } from "./TrainModel"
+import { Train, Wagon, Trains } from "./TrainModel"
 import { Error } from "../model/ErrorModel"
 import { Town, Towns } from "../model/TownModel"
 
@@ -25,7 +25,10 @@ const modelPlugin = new Elysia().model({
     Wagon: Wagon,
     Error: Error,
     Town: Town,
-    Towns: Towns
+    Towns: Towns,
+    Trains: Trains,
+    Business: Asset,
+    Businesses: t.Array(Asset)
 })
 
 export default modelPlugin

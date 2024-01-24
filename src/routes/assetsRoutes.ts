@@ -131,19 +131,40 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                             )
                             .group(":stationID/train", (plugin) =>
                                 plugin
-                                    .get("/", assetController.getAllTrains)
+                                    .get("/", assetController.getAllTrains, {
+                                        response: {
+                                            200: "Train",
+                                            404: "Error"
+                                        }
+                                    })
                                     .get(
                                         ":trainID",
-                                        assetController.getTrainByID
+                                        assetController.getTrainByID,
+                                        {
+                                            200: "Train",
+                                            404: "Error"
+                                        }
                                     )
                                     .post("/", assetController.buyTrain)
                                     .post(
                                         ":trainID/send/:destinationStationID",
-                                        assetController.sendTrain
+                                        assetController.sendTrain,
+                                        {
+                                            response: {
+                                                401: "Error",
+                                                404: "Error"
+                                            }
+                                        }
                                     )
                                     .get(
                                         ":trainID/wagon",
-                                        assetController.getWagon
+                                        assetController.getWagon,
+                                        {
+                                            response: {
+                                                200: "Wagon",
+                                                404: "Error"
+                                            }
+                                        }
                                     )
                             )
                     )
@@ -151,16 +172,50 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
     )
     .group("/business", { beforeHandle: validateToken }, (plugin) =>
         plugin
-            .get("/", assetController.getAllBusiness)
+            .get("/", assetController.getAllBusiness, {
+                response: {
+                    200: "Businesses",
+                    404: "Error"
+                }
+            })
             .group(":assetID", (plugin) =>
                 plugin
-                    .get("/", assetController.getBusinessByID)
-                    .post("/", assetController.buyBusiness)
+                    .get("/", assetController.getBusinessByID, {
+                        response: {
+                            200: "Business",
+                            404: "Error"
+                        }
+                    })
+                    .post("/", assetController.buyBusiness, {
+                        response: {
+                            200: "Business",
+                            404: "Error",
+                            402: "Error"
+                        }
+                    })
                     .group("/station", (plugin) =>
                         plugin
-                            .get("/", assetController.getStation)
-                            .get("/:stationID", assetController.getStationByID)
-                            .post("/", assetController.buyStation)
+                            .get("/", assetController.getStation, {
+                                response: {
+                                    200: "Station",
+                                    404: "Error"
+                                }
+                            })
+                            .get(
+                                "/:stationID",
+                                assetController.getStationByID,
+                                {
+                                    200: "Station",
+                                    404: "Error"
+                                }
+                            )
+                            .post("/", assetController.buyStation, {
+                                response: {
+                                    200: "Station",
+                                    401: "Error",
+                                    402: "Error"
+                                }
+                            })
                             .group(":stationID/railway", (plugin) =>
                                 plugin
                                     .get("/", assetController.getAllRailways)
@@ -171,10 +226,21 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                             )
                             .group(":stationID/train", (plugin) =>
                                 plugin
-                                    .get("/", assetController.getAllTrains)
+                                    .get("/", assetController.getAllTrains, {
+                                        response: {
+                                            200: "Trains",
+                                            404: "Error"
+                                        }
+                                    })
                                     .get(
                                         "/:trainID",
-                                        assetController.getTrainByID
+                                        assetController.getTrainByID,
+                                        {
+                                            response: {
+                                                200: "Train",
+                                                404: "Error"
+                                            }
+                                        }
                                     )
                                     .post("/", assetController.buyTrain)
                                     .post(

@@ -62,13 +62,19 @@ BEGIN
     UPDATE User SET funds = v_funds - v_cost WHERE userID = v_userID;
     UPDATE Asset SET userIDFK = v_userID WHERE assetID = v_assetID;
 
-    SELECT JSON_OBJECT(
-                   'assetID', assetID,
-                   'name', name,
-                   'userID', userIDFK,
-                   'type', type,
-                   'position', position,
-                   'cost', cost
+    SELECT JSON_OBJECT('assetID', assetID,
+                       'type', type,
+                       'name', name,
+                       'population', population,
+                       'position', JSON_OBJECT(
+                               'x', ST_X(position),
+                               'y', ST_Y(position)
+                                   ),
+                       'level', level,
+                       'cost', cost,
+                       'costPerDay', costPerDay,
+                       'worldID', worldIDFK,
+                       'userID', userIDFK
            )
     INTO v_data
     FROM Asset

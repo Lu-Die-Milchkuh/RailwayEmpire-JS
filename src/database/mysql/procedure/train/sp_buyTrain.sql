@@ -42,7 +42,7 @@ sp:BEGIN
 
     IF v_funds < v_cost THEN
         SELECT JSON_OBJECT(
-               'code', 401,
+               'code', 402,
                'message', 'Insufficient funds',
                'data', null
        ) as output;

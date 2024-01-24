@@ -33,3 +33,5 @@ export const Wagon = t.Object(
         }
     }
 )
+
+export const Trains = t.Array(Train)
