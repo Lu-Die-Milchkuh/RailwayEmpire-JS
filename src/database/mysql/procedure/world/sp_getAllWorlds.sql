@@ -5,10 +5,18 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_getAllWorlds;
 
 CREATE PROCEDURE sp_getAllWorlds()
-BEGIN
+sp:BEGIN
 
-    DECLARE v_worlds JSON;
     DECLARE v_data JSON;
+
+    IF NOT EXISTS(SELECT  * FROM World)THEN
+        SELECT JSON_OBJECT(
+               'code', 404,
+               'message', 'No Worlds found!',
+               'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
 
     -- Select world information and players for all worlds as JSON array
     SELECT JSON_ARRAYAGG(
@@ -49,3 +57,5 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+CALL sp_getAllWorlds();

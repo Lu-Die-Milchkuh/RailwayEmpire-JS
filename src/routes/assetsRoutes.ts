@@ -76,7 +76,7 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                         plugin
                             .get("/", assetController.getAllIndustries, {
                                 response: {
-                                    200: "Town",
+                                    200: "Industries",
                                     404: "Error"
                                 }
                             })
@@ -85,7 +85,7 @@ const assetRoutesPlugin = new Elysia({ prefix: "/world/:worldID/asset" })
                                 assetController.getIndustryByID,
                                 {
                                     response: {
-                                        200: "Industry",
+                                        200: "Industries",
                                         404: "Error"
                                     }
                                 }

@@ -5,7 +5,7 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS sp_getUser;
 
 CREATE PROCEDURE sp_getUser(IN p_jsonData JSON)
-BEGIN
+sp:BEGIN
     DECLARE v_token VARCHAR(255);
     DECLARE v_schema JSON;
     DECLARE v_userIDFK INT;
@@ -20,9 +20,14 @@ BEGIN
 
     SET v_token = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.token'));
 
+    IF NOT EXISTS(SELECT * FROM Token WHERE token = v_token) THEN
+        SELECT JSON_OBJECT('found',false) as output;
+        LEAVE sp;
+    END IF;
+
     SELECT userIDFK INTO v_userIDFK FROM Token WHERE token = v_token;
 
-    SELECT JSON_OBJECT('userID', userID, 'username', username) as output FROM User WHERE userID = v_userIDFK;
+    SELECT JSON_OBJECT('found',true,'userID', userID, 'username', username) as output FROM User WHERE userID = v_userIDFK;
 END//
 
 DELIMITER ;

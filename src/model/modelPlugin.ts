@@ -28,7 +28,8 @@ const modelPlugin = new Elysia().model({
     Towns: Towns,
     Trains: Trains,
     Business: Asset,
-    Businesses: t.Array(Asset)
+    Businesses: t.Array(Asset),
+    Industries: t.Array(Industry)
 })
 
 export default modelPlugin

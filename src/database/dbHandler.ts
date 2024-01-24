@@ -244,10 +244,10 @@ class dbHandler {
         const jsonData = {
             userID: userID,
             assetID: assetID,
-            type: type
+            type1: type
         }
         const result = await this.connection.execute(query, [jsonData])
-        return result[0][0][0]?.Industry
+        return result[0][0][0]?.output
     }
 
     // Train
@@ -262,10 +262,10 @@ class dbHandler {
         return result[0][0][0]?.output
     }
 
-    async getTrainByID(id) {
+    async getTrainByID(trainID) {
         const query = "CALL sp_getTrainByID(?);"
         const jsonData = {
-            trainID: id
+            trainID: trainID
         }
         const result = await this.connection.execute(query, [jsonData])
         return result[0][0][0]?.output

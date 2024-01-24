@@ -374,7 +374,7 @@ class AssetController {
                 }
             }
 
-            return output.message
+            return output.data
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
