@@ -56,7 +56,7 @@ This will pull and install all the necessary packages for the API to function pr
 
 ## API Documentation
 For a more detailed documentation visit: https://app.swaggerhub.com/apis/ZEBLU735_1/RailwayEmpire/1.0.0
-Alternative: Visit http://<IP>:<PORT>/swagger
+Alternative: Visit http://**IP**:**PORT**/swagger
 
 ## License
 
