@@ -510,7 +510,17 @@ class AssetController {
                 }
             }
 
-            return output.data
+            let business = output.data
+
+            // Workaround because the Elysia team
+            // thought it was a good idea
+            // that t.Optional can only be undefined
+            // and not null
+            if (!business.userID) {
+                business.userID = undefined
+            }
+
+            return business
         } catch (error) {
             console.log(error)
             ctx.set.status = 500
