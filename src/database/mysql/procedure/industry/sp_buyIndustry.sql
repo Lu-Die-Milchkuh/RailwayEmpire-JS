@@ -74,7 +74,7 @@ BEGIN
         LEAVE sp;
     END IF;
 
-    UPDATE User SET funds = funds - v_industryCost WHERE userID = v_userID;
+    UPDATE User SET funds = v_funds - v_industryCost WHERE userID = v_userID;
 
     INSERT INTO Industry(assetIDFK, type) VALUES (v_townID, v_industryType);
 
