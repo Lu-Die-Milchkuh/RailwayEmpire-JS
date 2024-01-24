@@ -465,6 +465,8 @@ class AssetController {
     }
 
     //************** Business **************
+
+    // Get all Business in the World
     async getAllBusiness(ctx) {
         const db = ctx.db
         const worldID = parseInt(ctx.params.worldID)
@@ -480,6 +482,7 @@ class AssetController {
 
             let businesses = output.data
 
+            // Yet again a Workaround
             businesses.forEach((business) => {
                 if (!business.userID) {
                     business.userID = undefined

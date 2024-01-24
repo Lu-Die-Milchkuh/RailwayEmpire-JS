@@ -34,6 +34,9 @@ const DB_CRED = {
     database: Bun.env.DB_NAME || "default"
 }
 
+// Wrapper Class to interact with the Database,
+// mostly just converts the input parameters into a format
+// the database expects (JSON in this case) and returns the "output" Object it retreives
 class dbHandler {
     private connection: mysql2.Connection
 
