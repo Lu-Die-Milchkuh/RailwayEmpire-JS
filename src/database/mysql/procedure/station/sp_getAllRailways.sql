@@ -10,7 +10,6 @@ BEGIN
     DECLARE v_stationID INT;
     DECLARE v_schema JSON;
     DECLARE v_data JSON;
-    DECLARE temp_stationID INT;
 
     SET v_schema = '{
       "stationID": "integer"
@@ -26,9 +25,7 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'stationID cannot be null';
     END IF;
 
-    SELECT Station.stationID INTO temp_stationID FROM Station WHERE Station.stationID = v_stationID;
-
-    IF temp_stationID IS NULL THEN
+    IF NOT EXISTS(SELECT * FROM Station WHERE Station.stationID = v_stationID) THEN
         SELECT JSON_OBJECT(
                        'code', 404,
                        'message', 'Station not found',
@@ -37,6 +34,14 @@ BEGIN
         LEAVE sp;
     END IF;
 
+    IF NOT EXISTS(SELECT * FROM Track WHERE Track.stationID1FK = v_stationID OR Track.stationID2FK = v_stationID) THEN
+        SELECT JSON_OBJECT(
+                       'code', 404,
+                       'message', 'No tracks found',
+                       'data', null
+               ) as output;
+        LEAVE sp;
+    END IF;
 
     SELECT JSON_ARRAYAGG(JSON_OBJECT(
             'trackID', trackID,

@@ -49,7 +49,7 @@ sp:BEGIN
         LEAVE sp;
     END IF;
 
-    UPDATE User SET funds = funds - v_cost WHERE userID = v_userID;
+    UPDATE User SET funds = v_funds - v_cost WHERE userID = v_userID;
 
     SELECT JSON_OBJECT(
                'code', 200,

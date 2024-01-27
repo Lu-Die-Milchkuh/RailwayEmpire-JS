@@ -10,7 +10,6 @@ sp:BEGIN
     DECLARE v_schema JSON;
     DECLARE v_businessID INT;
     DECLARE v_data JSON;
-    DECLARE temp_businessID INT;
 
     SET v_schema = '{
       "assetID": "integer"
@@ -22,9 +21,7 @@ sp:BEGIN
 
     SET v_businessID = JSON_UNQUOTE(JSON_EXTRACT(p_jsonData, '$.assetID'));
 
-    SELECT assetID INTO temp_businessID FROM Asset WHERE assetID = v_businessID AND type != 'TOWN';
-
-    IF temp_businessID IS NULL THEN
+    IF NOT EXISTS(SELECT * FROM Asset WHERE assetID = v_businessID) THEN
         SELECT JSON_OBJECT(
                    'code', 404,
                    'message', 'Business not found',

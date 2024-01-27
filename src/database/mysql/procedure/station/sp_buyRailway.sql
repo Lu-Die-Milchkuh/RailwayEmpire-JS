@@ -79,7 +79,7 @@ BEGIN
 
     INSERT INTO Track (stationID1FK, stationID2FK) VALUES (v_sourceStationID, v_destinationStationID);
     -- Cost of a Railway will just be its distance, in the future a better formula can be used
-    UPDATE User SET funds = funds - @distance WHERE userID = v_userID;
+    UPDATE User SET funds = v_funds - @distance WHERE userID = v_userID;
 
     SELECT JSON_OBJECT('code', 200,
                        'message', null,
